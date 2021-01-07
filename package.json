@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "telebot": "^1.4.1"
+    "dotenv": "8.2.0",
+    "telebot": "1.4.1"
   }
 }
