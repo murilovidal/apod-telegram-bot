@@ -7,43 +7,37 @@ const URL_RANDOM = process.env.URL_API + process.env.API_KEY + "&count=1";
 const ONE_HOUR = (3600 * 10) ^ 3;
 
 //APOD - Astronomy picture of the day
-async function getJSONAPOD(urlAPI) {
+async function getDataFromAPOD(urlAPI) {
   try {
-    jsonRecovered = await axios.get(urlAPI);
-    if (jsonRecovered.data) {
-      return jsonRecovered.data;
+    dataRecovered = await axios.get(urlAPI);
+    if (dataRecovered.data) {
+      return dataRecovered.data;
     } else {
-      throw "Json Empty";
+      throw new Error("Json Empty");
     }
   } catch (e) {
     console.error(e);
-    throw "Failed to retrieve JSON from " + urlAPI;
+    throw "Failed to retrieve data from " + urlAPI;
   }
 }
 
-async function sendImageURL(ctx, json) {
-  await ctx.replyWithPhoto({ url: json.url }, { caption: json.title });
-  console.log("PhotoURL sent." + new Date().toLocaleString());
-}
-//Lançar erro nas funções send e tratar na main
-async function sendVideoURL(ctx, json) {
+async function sendPictureToUser(ctx, dataAPOD) {
   try {
-    await ctx.reply({ url: json.url }, { caption: json.title });
-    console.log("Random VideoURL sent." + new Date().toLocaleString());
+    if (dataAPOD.media_type == "image") {
+      await ctx.replyWithPhoto(
+        { url: dataAPOD.url },
+        { caption: dataAPOD.title }
+      );
+      await ctx.reply(dataAPOD.explanation);
+      console.log("PhotoURL sent." + new Date().toLocaleString());
+    } else if (dataAPOD.media_type == "video") {
+      await ctx.reply({ url: dataAPOD.url }, { caption: dataAPOD.title });
+      await ctx.reply(dataAPOD.explanation);
+      console.log("VideoURL sent." + new Date().toLocaleString());
+    }
   } catch (e) {
-    sendErrorMessageToUser(ctx, "Failed to recover the image of the day. :(");
+    sendErrorMessageToUser(ctx, "Failed to recover the picture of the day. :(");
     console.error(e);
-  }
-}
-
-//Lançar erro nas funções send e tratar na main
-async function sendImageExplanation(ctx, json) {
-  try {
-    await ctx.reply(json.explanation);
-    console.log("Explanation sent." + new Date().toLocaleString());
-  } catch (e) {
-    console.error(e);
-    sendErrorMessageToUser(ctx, "Failed to recover explanation. :(");
   }
 }
 
@@ -52,24 +46,22 @@ async function sendErrorMessageToUser(ctx, errorMessageToUser) {
 }
 
 (async () => {
-  bot.start((ctx) => ctx.reply("Welcome!"));
+  bot.start((ctx) =>
+    ctx.reply(
+      "Welcome! This bot retrieves the NASA's Picture of the Day on command. Use /image to receive the picture of the day from NASA or /random to receive a random picture"
+    )
+  );
   bot.help((ctx) =>
     ctx.reply(
-      "Use /image to receive the image of the day from NASA or /random to receive a random image."
+      "Use /image to receive the picture of the day or /random to receive a random picture."
     )
   );
 
   bot.command("image", async (ctx) => {
-    let jsonNASA;
+    let dataAPOD;
     try {
-      jsonNASA = await getJSONAPOD(URL);
-      if (jsonNASA.media_type == "image") {
-        await sendImageURL(ctx, jsonNASA);
-        await sendImageExplanation(ctx, jsonNASA);
-      } else if (jsonNASA.media_type == "video") {
-        await sendVideoURL(ctx, jsonNASA);
-        await sendImageExplanation(ctx, jsonNASA);
-      }
+      dataAPOD = await getDataFromAPOD(URL);
+      sendPictureToUser(ctx, dataAPOD);
     } catch (e) {
       console.error(e);
       sendErrorMessageToUser(ctx, "Failed to recover the image of the day. :(");
@@ -77,20 +69,17 @@ async function sendErrorMessageToUser(ctx, errorMessageToUser) {
   });
 
   bot.command("random", async (ctx) => {
-    let jsonRandomImageNasa = null;
+    let randomDataAPOD = null;
     try {
-      jsonRandomImageNasa = await getJSONAPOD(URL_RANDOM);
-      jsonRandomImageNasa = jsonRandomImageNasa[0];
-      if (jsonRandomImageNasa.media_type == "image") {
-        await sendImageURL(ctx, jsonRandomImageNasa);
-        await sendImageExplanation(ctx, jsonRandomImageNasa);
-      } else if (jsonRandomImageNasa.media_type == "video") {
-        await sendVideoURL(ctx, jsonRandomImageNasa);
-        await sendImageExplanation(ctx, jsonRandomImageNasa);
-      }
+      randomDataAPOD = await getDataFromAPOD(URL_RANDOM);
+      randomDataAPOD = randomDataAPOD[0];
+      sendPictureToUser(ctx, randomDataAPOD);
     } catch (e) {
       console.error(e);
-      sendErrorMessageToUser(ctx, "Failed to recover the image of the day. :(");
+      sendErrorMessageToUser(
+        ctx,
+        "Failed to recover the picture of the day. :("
+      );
     }
   });
 
