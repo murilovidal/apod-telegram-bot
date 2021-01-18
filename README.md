@@ -34,4 +34,6 @@ run `npm install`
 
 - [**Murilo Vidal**](https://murilovidal.xyz/)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+Contributor
+
+- [**Felipe Amorim**](https://github.com/felipedesu/)
