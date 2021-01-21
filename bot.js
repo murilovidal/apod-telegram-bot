@@ -1,10 +1,22 @@
 require("dotenv").config();
+const { Sequelize, DataTypes, Model } = require("sequelize");
 const { Telegraf } = require("telegraf");
 const axios = require("axios");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const URL = process.env.URL_API + process.env.API_KEY;
 const URL_RANDOM = process.env.URL_API + process.env.API_KEY + "&count=1";
 const ONE_HOUR = (3600 * 10) ^ 3;
+
+const sequelize = new Sequelize(
+  process.env.DEV_DB_NAME,
+  process.env.DEV_DB_USERNAME,
+  process.env.DEV_DB_PASSWORD,
+  {
+    dialect: "postgres",
+  }
+);
+const UserModel = require("./db/models/user.js");
+const User = UserModel(sequelize, Sequelize);
 
 //APOD - Astronomy picture of the day
 async function getDataFromAPOD(urlAPI) {
@@ -45,6 +57,15 @@ async function sendErrorMessageToUser(ctx, errorMessageToUser) {
   await ctx.reply(errorMessageToUser);
 }
 
+async function authenticateDB() {
+  try {
+    await sequelize.authenticate();
+    console.log("Connection has been established successfully.");
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  }
+}
+
 (async () => {
   bot.start((ctx) =>
     ctx.reply(
@@ -82,6 +103,8 @@ async function sendErrorMessageToUser(ctx, errorMessageToUser) {
       );
     }
   });
+
+  bot.command("subscribe", async (ctx) => {});
 
   bot.hears("hi", (ctx) => ctx.reply("Hello. Use /help for more information."));
   bot.launch();
