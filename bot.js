@@ -152,7 +152,7 @@ async function sendImageToSubscribers() {
   } catch (e) {
     console.error(e);
   }
-  if (users.length) {
+  if (users) {
     users.forEach((user, index) => {
       sendPictureToChat(user.userId, dataAPOD);
     });
