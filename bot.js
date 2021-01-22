@@ -164,7 +164,31 @@ async function sendImageToSubscribers() {
       "Welcome! This bot retrieves the NASA's Picture of the Day on command. Use /image to receive the picture of the day from NASA or /random to receive a random picture"
     )
   );
-  // sendImageToSubscribers();
+  var dataAPOD;
+  try {
+    dataAPOD = await getDataFromAPOD(URL);
+  } catch (e) {
+    throw new Error("Failed to recover the image of the day. :(");
+    console.error(e);
+  }
+
+  var schedule = require("node-schedule");
+  var jobUpdateDataApod = schedule.scheduleJob(
+    "0 12,18,00,06 * * *",
+    async () => {
+      try {
+        dataAPOD = await getDataFromAPOD(URL);
+      } catch (e) {
+        throw new Error("Failed to recover the image of the day. :(");
+        console.error(e);
+      }
+    }
+  );
+  var jobImageToSubscribers = schedule.scheduleJob(
+    "0 06 * * *",
+    sendImageToSubscribers()
+  );
+
   bot.help((ctx) =>
     ctx.reply(
       "Use /image to receive the picture of the day or /random to receive a random picture."
@@ -172,9 +196,7 @@ async function sendImageToSubscribers() {
   );
 
   bot.command("image", async (ctx) => {
-    let dataAPOD;
     try {
-      dataAPOD = await getDataFromAPOD(URL);
       sendPictureToUser(ctx, dataAPOD);
     } catch (e) {
       console.error(e);
