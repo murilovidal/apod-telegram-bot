@@ -29,7 +29,7 @@ async function getDataFromAPOD(urlAPI) {
     }
   } catch (e) {
     console.error(e);
-    throw "Failed to retrieve data from " + urlAPI;
+    throw new Error("Failed to retrieve data from " + urlAPI);
   }
 }
 
@@ -40,21 +40,44 @@ async function sendPictureToUser(ctx, dataAPOD) {
         { url: dataAPOD.url },
         { caption: dataAPOD.title }
       );
-      await ctx.reply(dataAPOD.explanation);
       console.log("PhotoURL sent." + new Date().toLocaleString());
     } else if (dataAPOD.media_type == "video") {
       await ctx.reply({ url: dataAPOD.url }, { caption: dataAPOD.title });
-      await ctx.reply(dataAPOD.explanation);
       console.log("VideoURL sent." + new Date().toLocaleString());
     }
+    await ctx.reply(dataAPOD.explanation);
   } catch (e) {
-    sendErrorMessageToUser(ctx, "Failed to recover the picture of the day. :(");
+    sendTextMessageToUser(ctx, "Failed to recover the picture of the day. :(");
     console.error(e);
   }
 }
 
-async function sendErrorMessageToUser(ctx, errorMessageToUser) {
-  await ctx.reply(errorMessageToUser);
+async function sendPictureToChat(chatId, dataAPOD) {
+  try {
+    if (dataAPOD.media_type == "image") {
+      await bot.telegram.sendPhoto(
+        chatId,
+        { url: dataAPOD.url },
+        { caption: dataAPOD.title }
+      );
+      console.log("PhotoURL sent." + new Date().toLocaleString());
+    } else if (dataAPOD.media_type == "video") {
+      await bot.telegram.sendMessage(
+        chatId,
+        { url: dataAPOD.url },
+        { caption: dataAPOD.title }
+      );
+      console.log("VideoURL sent." + new Date().toLocaleString());
+    }
+    await bot.telegram.sendMessage(chatId, dataAPOD.explanation);
+  } catch (e) {
+    //sendTextMessageToUser(ctx, "Failed to recover the picture of the day. :(");
+    console.error(e);
+  }
+}
+
+async function sendTextMessageToUser(ctx, messageToUser) {
+  await ctx.reply(messageToUser);
 }
 
 async function authenticateDB() {
@@ -66,12 +89,82 @@ async function authenticateDB() {
   }
 }
 
+async function subscribeUser(ctx) {
+  let userSubscribed = await User.findOne({
+    where: {
+      userId: ctx.message.chat.id,
+    },
+  });
+  if (userSubscribed) {
+    sendTextMessageToUser(
+      ctx,
+      "You have already subscribed! To unsubscribe use /unsubscribe"
+    );
+  } else {
+    try {
+      await User.create({
+        userName: ctx.message.chat.first_name,
+        userId: ctx.message.chat.id,
+      });
+      sendTextMessageToUser(
+        ctx,
+        "Subscription sucessful! You will receive the NASA's Astronomy Picture Of the Day automatically."
+      );
+    } catch (e) {
+      console.error(e);
+      throw new Error("Unable to complete subscription.");
+    }
+  }
+}
+
+async function unSubscribeUser(ctx) {
+  let userSubscribed = await User.findOne({
+    where: {
+      userId: ctx.message.chat.id,
+    },
+  });
+  if (userSubscribed) {
+    try {
+      await userSubscribed.destroy();
+      sendTextMessageToUser(
+        ctx,
+        "Unsubscription sucessful! You will NOT receive the NASA's Astronomy Picture Of the Day automatically."
+      );
+    } catch (e) {
+      console.error(e);
+      throw new Error(
+        "Unable to complete unsubscription. Please try again later."
+      );
+    }
+  } else {
+    sendTextMessageToUser(
+      ctx,
+      "You are not subscribed. To subscribe use /subscribe"
+    );
+  }
+}
+
+async function sendImageToSubscribers() {
+  let dataAPOD;
+  let users;
+  try {
+    users = await User.findAll();
+    dataAPOD = await getDataFromAPOD(URL);
+  } catch (e) {
+    console.error(e);
+  }
+  users.forEach((user, index) => {
+    sendPictureToChat(user.userId, dataAPOD);
+  });
+}
+
 (async () => {
   bot.start((ctx) =>
     ctx.reply(
       "Welcome! This bot retrieves the NASA's Picture of the Day on command. Use /image to receive the picture of the day from NASA or /random to receive a random picture"
     )
   );
+  // sendImageToSubscribers();
   bot.help((ctx) =>
     ctx.reply(
       "Use /image to receive the picture of the day or /random to receive a random picture."
@@ -85,7 +178,7 @@ async function authenticateDB() {
       sendPictureToUser(ctx, dataAPOD);
     } catch (e) {
       console.error(e);
-      sendErrorMessageToUser(ctx, "Failed to recover the image of the day. :(");
+      sendTextMessageToUser(ctx, "Failed to recover the image of the day. :(");
     }
   });
 
@@ -97,15 +190,19 @@ async function authenticateDB() {
       sendPictureToUser(ctx, randomDataAPOD);
     } catch (e) {
       console.error(e);
-      sendErrorMessageToUser(
+      sendTextMessageToUser(
         ctx,
         "Failed to recover the picture of the day. :("
       );
     }
   });
 
-  bot.command("subscribe", async (ctx) => {});
-
+  bot.command("subscribe", async (ctx) => {
+    await subscribeUser(ctx);
+  });
+  bot.command("unsubscribe", async (ctx) => {
+    await unSubscribeUser(ctx);
+  });
   bot.hears("hi", (ctx) => ctx.reply("Hello. Use /help for more information."));
   bot.launch();
   process.once("SIGINT", () => bot.stop("SIGINT"));
