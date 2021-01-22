@@ -6,15 +6,10 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 const URL = process.env.URL_API + process.env.API_KEY;
 const URL_RANDOM = process.env.URL_API + process.env.API_KEY + "&count=1";
 const ONE_HOUR = (3600 * 10) ^ 3;
+const database = require("./config/database.js");
 
-const sequelize = new Sequelize(
-  process.env.DEV_DB_NAME,
-  process.env.DEV_DB_USERNAME,
-  process.env.DEV_DB_PASSWORD,
-  {
-    dialect: "postgres",
-  }
-);
+const sequelize = new Sequelize(database.development);
+
 const UserModel = require("./db/models/user.js");
 const User = UserModel(sequelize, Sequelize);
 
@@ -60,14 +55,18 @@ async function sendPictureToChat(chatId, dataAPOD) {
         { url: dataAPOD.url },
         { caption: dataAPOD.title }
       );
-      console.log("PhotoURL sent." + new Date().toLocaleString());
+      console.log(
+        "PhotoURL sent to subscribers." + new Date().toLocaleString()
+      );
     } else if (dataAPOD.media_type == "video") {
       await bot.telegram.sendMessage(
         chatId,
         { url: dataAPOD.url },
         { caption: dataAPOD.title }
       );
-      console.log("VideoURL sent." + new Date().toLocaleString());
+      console.log(
+        "VideoURL sent to subscribers." + new Date().toLocaleString()
+      );
     }
     await bot.telegram.sendMessage(chatId, dataAPOD.explanation);
   } catch (e) {
@@ -153,9 +152,11 @@ async function sendImageToSubscribers() {
   } catch (e) {
     console.error(e);
   }
-  users.forEach((user, index) => {
-    sendPictureToChat(user.userId, dataAPOD);
-  });
+  if (users.length) {
+    users.forEach((user, index) => {
+      sendPictureToChat(user.userId, dataAPOD);
+    });
+  }
 }
 
 (async () => {
@@ -185,7 +186,7 @@ async function sendImageToSubscribers() {
     }
   );
   var jobImageToSubscribers = schedule.scheduleJob(
-    "0 06 * * *",
+    "5 6 * * *",
     sendImageToSubscribers()
   );
 
