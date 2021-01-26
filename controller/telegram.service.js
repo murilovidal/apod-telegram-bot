@@ -35,4 +35,9 @@ module.exports = {
       }
     }
   },
+  sendPictureToUsers: async function (users, dataAPOD) {
+    await Promise.all(
+      users.map((u) => module.exports.sendPictureToUser(u, dataAPOD))
+    );
+  },
 };

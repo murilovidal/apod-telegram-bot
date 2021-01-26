@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Sequelize, DataTypes, Model } = require("sequelize");
+const { Sequelize } = require("sequelize");
 const { Telegraf } = require("telegraf");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const database = require("./config/database.js");

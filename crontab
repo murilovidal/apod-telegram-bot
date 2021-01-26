@@ -1,0 +1,1 @@
+0 * * * * node cron-updateDBApod.js
