@@ -6,10 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       userName: { primaryKey: true, type: DataTypes.INTEGER },
       userId: DataTypes.INTEGER,
-      active: DataTypes.BOOLEAN,
     },
     {
       sequelize,
+      paranoid: true,
       modelName: "User",
     }
   );

@@ -7,37 +7,30 @@ const TelegramService = require("./telegram.service.js");
 
 module.exports = {
   subscribeUser: async function (user) {
-    //Criar checkSubscribed em user.model
-    let userSubscribed = await User.findOne({
-      where: {
+    const [newUser, created] = await User.findOrCreate({
+      where: { userId: user.userId },
+      defaults: {
         userId: user.userId,
+        userName: user.userName,
       },
+      paranoid: false,
     });
-    if (userSubscribed) {
-      if (userSubscribed.active) {
-        TelegramService.sendTextMessageToUser(
-          user,
-          "You have already subscribed! To unsubscribe use /unsubscribe"
-        );
-      } else {
-        userSubscribed.active = true;
-        await userSubscribed.save();
-        TelegramService.sendTextMessageToUser(
-          user,
-          "Subscription sucessful! You will receive the NASA's Astronomy Picture Of the Day automatically."
-        );
-      }
+    if (created) {
+      TelegramService.sendTextMessageToUser(
+        newUser,
+        "Subscription sucessful! You will receive the NASA's Astronomy Picture Of the Day automatically."
+      );
+    } else if (newUser.deletedAt) {
+      newUser.restore();
+      TelegramService.sendTextMessageToUser(
+        newUser,
+        "Subscription sucessful! You will receive the NASA's Astronomy Picture Of the Day automatically."
+      );
     } else {
-      try {
-        await user.save();
-        TelegramService.sendTextMessageToUser(
-          user,
-          "Subscription sucessful! You will receive the NASA's Astronomy Picture Of the Day automatically."
-        );
-      } catch (e) {
-        console.error(e);
-        throw new Error("Unable to complete subscription.");
-      }
+      TelegramService.sendTextMessageToUser(
+        newUser,
+        "You are already subscribed! To unsubscribe use /unsubscribe"
+      );
     }
   },
 
@@ -46,13 +39,11 @@ module.exports = {
     let userSubscribed = await User.findOne({
       where: {
         userId: user.userId,
-        active: true,
       },
     });
     if (userSubscribed) {
       try {
-        userSubscribed.active = false;
-        await userSubscribed.save();
+        await userSubscribed.destroy();
         TelegramService.sendTextMessageToUser(
           user,
           "Unsubscription sucessful! You will NOT receive the NASA's Astronomy Picture Of the Day automatically."

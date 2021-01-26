@@ -1,45 +1,16 @@
 require("dotenv").config();
 const { Sequelize, DataTypes, Model } = require("sequelize");
 const { Telegraf } = require("telegraf");
-const axios = require("axios");
 const bot = new Telegraf(process.env.BOT_TOKEN);
-const URL = process.env.URL_API + process.env.API_KEY;
-const URL_RANDOM = process.env.URL_API + process.env.API_KEY + "&count=1";
-const ONE_HOUR = (3600 * 10) ^ 3;
 const database = require("./config/database.js");
 const sequelize = new Sequelize(database.development);
 const Subscription = require("./controller/user-subscription.controller.js");
 const UserModel = require("./db/models/user.js");
 const User = UserModel(sequelize, Sequelize);
 const TelegramService = require("./controller/telegram.service.js");
+const ApodData = require("./controller/apod.controller.js");
 
 //APOD - Astronomy picture of the day
-async function getDataFromAPOD(urlAPI) {
-  try {
-    dataRecovered = await axios.get(urlAPI);
-    if (dataRecovered.data) {
-      return dataRecovered.data;
-    } else {
-      throw new Error("Json Empty");
-    }
-  } catch (e) {
-    console.error(e);
-    throw new Error("Failed to retrieve data from " + urlAPI);
-  }
-}
-
-async function sendTextMessageToUser(ctx, messageToUser) {
-  await ctx.reply(messageToUser);
-}
-
-async function authenticateDB() {
-  try {
-    await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
-}
 
 function getUserFromCtx(ctx) {
   return User.build({
@@ -54,9 +25,10 @@ function getUserFromCtx(ctx) {
       "Welcome! This bot retrieves the NASA's Picture of the Day on command. Use /image to receive the picture of the day from NASA or /random to receive a random picture"
     )
   );
+
   var dataAPOD;
   try {
-    dataAPOD = await getDataFromAPOD(URL);
+    dataAPOD = await ApodData.getDataFromAPI();
   } catch (e) {
     throw new Error("Failed to recover the image of the day. :(");
     console.error(e);
@@ -85,8 +57,7 @@ function getUserFromCtx(ctx) {
     user = getUserFromCtx(ctx);
     let randomDataAPOD = null;
     try {
-      randomDataAPOD = await getDataFromAPOD(URL_RANDOM);
-      randomDataAPOD = randomDataAPOD[0];
+      randomDataAPOD = await ApodData.getRandom();
       TelegramService.sendPictureToUser(user, randomDataAPOD);
     } catch (e) {
       console.error(e);
