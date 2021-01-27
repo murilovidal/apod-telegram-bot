@@ -36,14 +36,16 @@ async function getAPODData(url) {
 }
 
 module.exports = {
-  getDataFromAPI: async function () {
-    return await getAPODData(URL);
+  getMediaFromAPI: async function () {
+    return getAPODData(URL);
   },
-  getRandom: async function () {
-    return await getAPODData(URL_RANDOM);
+  getRandomMedia: async function () {
+    return getAPODData(URL_RANDOM);
   },
-  getFromDB: async function () {
-    return Apod.findOne();
+  getMediaFromDB: async function () {
+    return Apod.findOne({
+      order: [["createdAt", "DESC"]],
+    });
   },
   store: async function (ApodData) {
     try {

@@ -35,7 +35,6 @@ module.exports = {
   },
 
   unSubscribeUser: async function (user) {
-    //improve checkSubscribed
     let userSubscribed = await User.findOne({
       where: {
         userId: user.userId,

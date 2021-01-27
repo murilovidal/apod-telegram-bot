@@ -4,13 +4,11 @@ const { Telegraf } = require("telegraf");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const database = require("./config/database.js");
 const sequelize = new Sequelize(database.development);
-const Subscription = require("./controller/user-subscription.controller.js");
+const SubscriptionController = require("./controller/user-subscription.controller.js");
 const UserModel = require("./db/models/user.js");
 const User = UserModel(sequelize, Sequelize);
 const TelegramService = require("./controller/telegram.service.js");
-const ApodData = require("./controller/apod.controller.js");
-
-//APOD - Astronomy picture of the day
+const ApodDataController = require("./controller/apod.controller.js");
 
 function getUserFromCtx(ctx) {
   return User.build({
@@ -26,14 +24,6 @@ function getUserFromCtx(ctx) {
     )
   );
 
-  var dataAPOD;
-  try {
-    dataAPOD = await ApodData.getDataFromAPI();
-  } catch (e) {
-    throw new Error("Failed to recover the image of the day. :(");
-    console.error(e);
-  }
-
   bot.help((ctx) =>
     ctx.reply(
       "Use /image to receive the picture of the day or /random to receive a random picture."
@@ -41,9 +31,20 @@ function getUserFromCtx(ctx) {
   );
 
   bot.command("image", async (ctx) => {
-    user = getUserFromCtx(ctx);
+    let dataAPOD;
+    let user = getUserFromCtx(ctx);
     try {
-      TelegramService.sendPictureToUser(user, dataAPOD);
+      dataAPOD = await ApodDataController.getMediaFromDB();
+    } catch (e) {
+      TelegramService.sendTextMessageToUser(
+        user,
+        "Failed to recover the image of the day. :("
+      );
+      throw new Error("Failed to recover the image of the day. :(");
+      console.error(e);
+    }
+    try {
+      TelegramService.sendMediaToUser(user, dataAPOD);
     } catch (e) {
       console.error(e);
       TelegramService.sendTextMessageToUser(
@@ -54,11 +55,11 @@ function getUserFromCtx(ctx) {
   });
 
   bot.command("random", async (ctx) => {
-    user = getUserFromCtx(ctx);
+    let user = getUserFromCtx(ctx);
     let randomDataAPOD = null;
     try {
-      randomDataAPOD = await ApodData.getRandom();
-      TelegramService.sendPictureToUser(user, randomDataAPOD);
+      randomDataAPOD = await ApodDataController.getRandomMedia();
+      TelegramService.sendMediaToUser(user, randomDataAPOD);
     } catch (e) {
       console.error(e);
       TelegramService.sendTextMessageToUser(
@@ -70,12 +71,12 @@ function getUserFromCtx(ctx) {
 
   bot.command("subscribe", async (ctx) => {
     user = getUserFromCtx(ctx);
-    await Subscription.subscribeUser(user);
+    await SubscriptionController.subscribeUser(user);
   });
 
   bot.command("unsubscribe", async (ctx) => {
     user = getUserFromCtx(ctx);
-    await Subscription.unSubscribeUser(user);
+    await SubscriptionController.unSubscribeUser(user);
   });
 
   bot.hears("hi", (ctx) => ctx.reply("Hello. Use /help for more information."));
