@@ -1,9 +1,6 @@
-# ENV
-.env
-
-# Dependency directories
+.idea/
+.vscode/
 node_modules/
-
-Vagrantfile
-.vagrant/
-ubuntu-bionic-18.04-cloudimg-console.log
+build/
+tmp/
+temp/
