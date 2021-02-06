@@ -5,7 +5,8 @@
   "main": "app.ts",
   "scripts": {
     "test": "mocha -r ts-node/register 'src/tests/**/*.ts'",
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "typeorm": "ts-node './node_modules/typeorm/cli.js'"
   },
   "repository": {
     "type": "git",
@@ -32,9 +33,10 @@
     "typescript": "3.3.3333"
   },
   "dependencies": {
+    "chai-as-promised": "^7.1.1",
     "dotenv": "8.2.0",
     "pg": "8.5.1",
-    "reflect-metadata": "^0.1.10",
+    "reflect-metadata": "0.1.10",
     "typeorm": "0.2.30",
     "typescript": "4.1.3"
   }
