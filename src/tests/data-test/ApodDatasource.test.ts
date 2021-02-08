@@ -23,7 +23,7 @@ afterEach(async () => {
   await connection.synchronize();
 });
 
-describe("Should not save apod without url", () => {
+describe("apod-datasource || Should not save apod without url", () => {
   it("Returns error 'Cannot set apod without url'", async () => {
     let apod = new Apod();
     apod.title = "Death Star";
@@ -39,7 +39,7 @@ describe("Should not save apod without url", () => {
   });
 });
 
-describe("Should not save apod without title", () => {
+describe("apod-datasource || Should not save apod without title", () => {
   it("Returns error 'Cannot set apod without title'", async () => {
     let apod = new Apod();
     apod.url = "www.apod.com";
@@ -54,7 +54,7 @@ describe("Should not save apod without title", () => {
     expect.fail("Should have thrown error");
   });
 });
-describe("Should not save apod without explanation", () => {
+describe("apod-datasource || should not save apod without explanation", () => {
   it("Returns error 'Cannot set apod without explanation'", async () => {
     let apod = new Apod();
     apod.title = "Blue Death Star";
@@ -68,7 +68,7 @@ describe("Should not save apod without explanation", () => {
     expect.fail("Should have thrown error");
   });
 });
-describe("Should not save apod without media type", () => {
+describe("apod-datasource || Should not save apod without media type", () => {
   it("Returns error 'Cannot set apod without media type'", async () => {
     let apod = new Apod();
     apod.title = "Blue Death Star";
@@ -83,7 +83,7 @@ describe("Should not save apod without media type", () => {
   });
 });
 
-describe("Should return a true when the apod is registered in database", () => {
+describe("apod-datasource || Should return a true when the apod is registered in database", () => {
   it("Returns true", async () => {
     setApod(fakeApod()).then((result) => {
       expect(result).to.equal(true);
@@ -91,7 +91,7 @@ describe("Should return a true when the apod is registered in database", () => {
   });
 });
 
-describe("Should return the latest instance of apod", () => {
+describe("apod-datasource || Should return the latest instance of apod", () => {
   it("Returns apod", async () => {
     let apod = fakeApod();
     await setApod(apod);
@@ -99,7 +99,7 @@ describe("Should return the latest instance of apod", () => {
   });
 });
 
-describe("Should return error when no apod is found'", () => {
+describe("apod-datasource || Should return error when no apod is found'", () => {
   it("Returns error", async () => {
     try {
       await getApod();

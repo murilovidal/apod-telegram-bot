@@ -27,9 +27,7 @@ before(async () => {
   return connection;
 });
 
-beforeEach(async () => {
-  const connection = await getConnection();
-});
+beforeEach(async () => {});
 
 afterEach(async () => {
   const connection = await getConnection();
@@ -37,7 +35,7 @@ afterEach(async () => {
   await connection.synchronize();
 });
 
-describe("Should not save user without firstname", () => {
+describe("user-datasource || Should not save user without firstname", () => {
   it("Returns error", async () => {
     var user = new User();
     user.id = 123;
@@ -51,7 +49,7 @@ describe("Should not save user without firstname", () => {
   });
 });
 
-describe("Should not save user without id", () => {
+describe("user-datasource || Should not save user without id", () => {
   it("Returns error", async () => {
     let user = new User();
     user.firstName = "Aragorn";
@@ -65,7 +63,7 @@ describe("Should not save user without id", () => {
   });
 });
 
-describe("Should not save user with same id", () => {
+describe("user-datasource || Should not save user with same id", () => {
   it("Returns error", async () => {
     await setUser(fakeUser());
     try {
@@ -78,20 +76,20 @@ describe("Should not save user with same id", () => {
   });
 });
 
-describe("Should return a true when the user is registered in database", () => {
+describe("user-datasource || Should return a true when the user is registered in database", () => {
   it("Returns true", async () => {
     expect(await setUser(fakeUser())).to.be.true;
   });
 });
 
-describe("Should return a user searched by id", () => {
+describe("user-datasource || Should return a user searched by id", () => {
   it("Returns user", async () => {
     await setUser(fakeUser());
     expect(await getUser(1984)).to.be.instanceOf(User);
   });
 });
 
-describe("Should return a user searched by name", () => {
+describe("user-datasource || Should return a user searched by name", () => {
   it("Returns user", async () => {
     getUser("Beeblebrox").then((result) => {
       expect(result).to.equal(User);
@@ -99,7 +97,7 @@ describe("Should return a user searched by name", () => {
   });
 });
 
-describe("Should return error when user is not found", () => {
+describe("user-datasource || Should return error when user is not found", () => {
   it("Returns message 'user not found'", async () => {
     try {
       await getUser(12345);
@@ -111,7 +109,7 @@ describe("Should return error when user is not found", () => {
   });
 });
 
-describe("Should delete a user", () => {
+describe("user-datasource || Should delete a user", () => {
   it("Returns success", async () => {
     let user = fakeUser();
     await setUser(user);
@@ -119,7 +117,7 @@ describe("Should delete a user", () => {
   });
 });
 
-describe("Should return error when failed to delete user", () => {
+describe("user-datasource || Should return error when failed to delete user", () => {
   it("Returns error", async () => {
     let user = fakeUser();
     user.id = 988;
@@ -133,7 +131,7 @@ describe("Should return error when failed to delete user", () => {
   });
 });
 
-describe("Should restore deleted User", () => {
+describe("user-datasource || Should restore deleted User", () => {
   it("Returns true", async () => {
     let user = fakeUser();
     await setUser(user);
