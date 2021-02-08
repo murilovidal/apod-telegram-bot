@@ -5,7 +5,12 @@ import {
   getUser,
   setUser,
 } from "../../data/datasource/User.datasource";
-import { createConnection, getConnection } from "typeorm";
+import {
+  createConnection,
+  getConnection,
+  getRepository,
+  Repository,
+} from "typeorm";
 import { expect } from "chai";
 
 function fakeUser() {
@@ -34,7 +39,7 @@ afterEach(async () => {
 
 describe("Should not save user without firstname", () => {
   it("Returns error", async () => {
-    let user = new User();
+    var user = new User();
     user.id = 123;
     try {
       await setUser(user);
@@ -66,7 +71,7 @@ describe("Should not save user with same id", () => {
     try {
       await setUser(fakeUser());
     } catch (error) {
-      expect(error);
+      expect(error.message).to.be.eq("User already set in database");
       return;
     }
     expect.fail("Should have thrown error");
@@ -95,7 +100,7 @@ describe("Should return a user searched by name", () => {
 });
 
 describe("Should return error when user is not found", () => {
-  it("Returns message error", async () => {
+  it("Returns message 'user not found'", async () => {
     try {
       await getUser(12345);
     } catch (error) {
@@ -125,5 +130,14 @@ describe("Should return error when failed to delete user", () => {
       return;
     }
     expect.fail("Should have thrown error");
+  });
+});
+
+describe("Should restore deleted User", () => {
+  it("Returns true", async () => {
+    let user = fakeUser();
+    await setUser(user);
+    await deleteUser(user);
+    expect(await setUser(user)).to.be.true;
   });
 });
