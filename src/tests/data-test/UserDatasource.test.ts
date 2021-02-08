@@ -1,6 +1,10 @@
 import "mocha";
 import { User } from "../../data/entity/User.entity";
-import { getUser, setUser } from "../../data/datasource/User.datasource";
+import {
+  deleteUser,
+  getUser,
+  setUser,
+} from "../../data/datasource/User.datasource";
 import { createConnection, getConnection } from "typeorm";
 import { expect } from "chai";
 
@@ -29,13 +33,13 @@ afterEach(async () => {
 });
 
 describe("Should not save user without firstname", () => {
-  it("Returns error 'Cannot set user without firstName'", async () => {
+  it("Returns error", async () => {
     let user = new User();
     user.id = 123;
     try {
       await setUser(user);
     } catch (error) {
-      expect(error.message).to.be.eq("Cannot set user without firstName");
+      expect(error);
       return;
     }
     expect.fail("Should have thrown error");
@@ -43,13 +47,13 @@ describe("Should not save user without firstname", () => {
 });
 
 describe("Should not save user without id", () => {
-  it("Returns error 'Cannot set user without id'", async () => {
+  it("Returns error", async () => {
     let user = new User();
     user.firstName = "Aragorn";
     try {
       await setUser(user);
     } catch (error) {
-      expect(error.message).to.be.eq("Cannot set user without id");
+      expect(error);
       return;
     }
     expect.fail("Should have thrown error");
@@ -57,12 +61,12 @@ describe("Should not save user without id", () => {
 });
 
 describe("Should not save user with same id", () => {
-  it("Returns error 'User already set in database'", async () => {
+  it("Returns error", async () => {
     await setUser(fakeUser());
     try {
       await setUser(fakeUser());
     } catch (error) {
-      expect(error.message).to.be.eq("User already set in database");
+      expect(error);
       return;
     }
     expect.fail("Should have thrown error");
@@ -71,9 +75,7 @@ describe("Should not save user with same id", () => {
 
 describe("Should return a true when the user is registered in database", () => {
   it("Returns true", async () => {
-    setUser(fakeUser()).then((result) => {
-      expect(result).to.equal(true);
-    });
+    expect(await setUser(fakeUser())).to.be.true;
   });
 });
 
@@ -92,12 +94,34 @@ describe("Should return a user searched by name", () => {
   });
 });
 
-describe("Should return message 'user not found'", () => {
-  it("Returns message 'user not found'", async () => {
+describe("Should return error when user is not found", () => {
+  it("Returns message error", async () => {
     try {
       await getUser(12345);
     } catch (error) {
-      expect(error.message).to.be.eq("User not found");
+      expect(error);
+      return;
+    }
+    expect.fail("Should have thrown error");
+  });
+});
+
+describe("Should delete a user", () => {
+  it("Returns success", async () => {
+    let user = fakeUser();
+    await setUser(user);
+    expect((await deleteUser(user)).affected).to.be.eq(1);
+  });
+});
+
+describe("Should return error when failed to delete user", () => {
+  it("Returns error", async () => {
+    let user = fakeUser();
+    user.id = 988;
+    try {
+      await deleteUser(user.id);
+    } catch (error) {
+      expect(error);
       return;
     }
     expect.fail("Should have thrown error");
