@@ -1,28 +1,29 @@
 import {
   Entity,
   Column,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  AfterInsert,
 } from "typeorm";
 
 @Entity()
 export class Apod {
-  @PrimaryColumn()
-  id: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-  @Column()
-  url: string;
+  @Column({ nullable: false })
+  url!: string;
 
-  @Column()
-  title: string;
+  @Column({ nullable: false })
+  title!: string;
 
-  @Column()
-  explanation: string;
+  @Column({ nullable: false })
+  explanation!: string;
 
-  @Column()
-  media_type: string;
+  @Column({ nullable: false, name: "media_type" })
+  mediaType!: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;

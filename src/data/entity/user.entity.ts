@@ -4,23 +4,22 @@ import {
   PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn,
 } from "typeorm";
 
 @Entity({ name: "user" })
 export class User {
-  @PrimaryColumn()
-  id: number;
+  @PrimaryColumn({ nullable: false, unique: true })
+  id!: number;
 
-  @Column()
-  firstName: string;
+  @Column({ nullable: false })
+  firstName!: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: "updated_at" })
-  UpdatedAt!: Date;
+  updatedAt!: Date;
 
-  @DeleteDateColumn({ name: "deleted_at" })
-  deletedAt!: Date;
+  @Column({ name: "is_active", default: true })
+  isActive!: boolean;
 }
