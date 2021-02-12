@@ -2,9 +2,9 @@ import { getConnection } from "typeorm";
 import { User } from "../entity/user.entity";
 
 export class UserDatasource {
-  public async setUser(_user: User) {
+  async setUser(_user: User) {
     const connection = getConnection();
-    const repository = await connection.getRepository(User);
+    const repository = connection.getRepository(User);
 
     return await repository
       .createQueryBuilder()
@@ -12,22 +12,32 @@ export class UserDatasource {
       .values([{ id: _user.id, firstName: _user.firstName }])
       .execute();
   }
+  async updateUser(_user: User) {
+    const connection = getConnection();
+    const repository = connection.getRepository(User);
 
-  public async findUserById(_id: number) {
+    return await repository
+      .createQueryBuilder()
+      .update()
+      .set({ isActive: true })
+      .where("id = :id", { id: _user.id })
+      .execute();
+  }
+  async findUserById(_id: number) {
     const connection = getConnection();
     const repository = connection.getRepository(User);
     return await repository.findOne(_id);
   }
 
-  public async findUserByName(_name: string) {
+  async findUserByName(_name: string) {
     const connection = getConnection();
-    const repository = await connection.getRepository(User);
-    return repository.findOne(_name);
+    const repository = connection.getRepository(User);
+    return await repository.findOne(_name);
   }
 
-  public async deleteUser(user: User) {
+  async deleteUser(user: User) {
     let connection = getConnection();
-    let repository = await connection.getRepository(User);
+    let repository = connection.getRepository(User);
     return await repository.update(user.id, { isActive: false });
   }
 }

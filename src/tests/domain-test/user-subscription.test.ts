@@ -1,17 +1,15 @@
-import {
-  subscribeUser,
-  unsubscribeUser,
-} from "../../domain/subscribe-user.use-case";
 import { expect } from "chai";
 import "mocha";
 import { User } from "../../data/entity/user.entity";
+import { UserSubscription } from "../../domain/user-subscription.use-case";
 
+const userSubscription = new UserSubscription();
 describe("Subscribe user", () => {
   it("Should return a true when the user is subscribed", async () => {
     let user = new User();
     user.firstName = "Rorschasch";
     user.id = 123445;
-    expect(await subscribeUser(user)).to.be.true;
+    expect(await userSubscription.subscribeUser(user)).to.be.true;
   });
 
   it("Should return error when subscribing the user fails", async () => {
@@ -19,7 +17,7 @@ describe("Subscribe user", () => {
     user.firstName = "Rorschasch";
     user.id = 123;
     try {
-      return await subscribeUser(user);
+      return await userSubscription.subscribeUser(user);
     } catch (error) {
       expect(error.message).to.be.eq("Failed to subscribe user.");
     }
@@ -29,9 +27,9 @@ describe("Subscribe user", () => {
     let user = new User();
     user.firstName = "Rorschasch";
     user.id = 123;
-    await subscribeUser(user);
+    await userSubscription.subscribeUser(user);
     try {
-      await subscribeUser(user);
+      await userSubscription.subscribeUser(user);
     } catch (error) {
       expect(error);
       return;
@@ -43,17 +41,17 @@ describe("Subscribe user", () => {
     let user = new User();
     user.firstName = "Rorschasch";
     user.id = 123445;
-    await subscribeUser(user);
-    expect(await unsubscribeUser(user)).to.be.true;
+    await userSubscription.subscribeUser(user);
+    expect(await userSubscription.unsubscribeUser(user)).to.be.true;
   });
 
   it("Should return error when unsubscribing the user fails", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
     user.id = 123;
-    await subscribeUser(user);
+    await userSubscription.subscribeUser(user);
     try {
-      return await unsubscribeUser(user);
+      return await userSubscription.unsubscribeUser(user);
     } catch (error) {
       expect(error.message).to.be.eq("Error: Failed to unsubscribe user.");
     }
