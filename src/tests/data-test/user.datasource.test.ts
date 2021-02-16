@@ -92,4 +92,18 @@ describe("User datasource", () => {
     await userDatasource.setUser(user);
     expect((await userDatasource.deleteUser(user)).affected).to.be.eq(1);
   });
+
+  it("Should save user id", async () => {
+    let user = fakeUser();
+    await userDatasource.setUser(user);
+    let savedUser = await userDatasource.findUserById(user.id);
+    expect(savedUser.id).to.be.eq(user.id);
+  });
+
+  it("Should save user firstName", async () => {
+    let user = fakeUser();
+    await userDatasource.setUser(user);
+    let savedUser = await userDatasource.findUserById(user.id);
+    expect(savedUser.firstName).to.be.eq(user.firstName);
+  });
 });

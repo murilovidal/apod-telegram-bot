@@ -1,27 +1,41 @@
-import { getConnection } from "typeorm";
+import { getConnection, UpdateResult } from "typeorm";
 import { Apod } from "../entity/apod.entity";
-require("dotenv").config();
+import { EnvService } from "../../domain/env-service";
 const axios = require("axios");
 
-export class ApodDatasource {
-  protected URL_API = <string>process.env.URL_API;
-  protected API_KEY = <string>process.env.API_KEY;
-  protected URL_RANDOM = `${this.URL_API + this.API_KEY}&count=1`;
+const envService = new EnvService();
 
-  public setApod(apod: Apod) {
+export class ApodDatasource {
+  URL_API: string;
+  API_KEY: string;
+  URL_RANDOM: string;
+
+  constructor() {
+    this.URL_API = envService.URL_API;
+    this.API_KEY = envService.API_KEY;
+    this.URL_RANDOM = envService.URL_RANDOM;
+  }
+
+  public async setApod(apod: Apod): Promise<Apod> {
     const connection = getConnection();
     const repository = connection.getRepository(Apod);
-    return repository.save(apod);
+
+    return await repository.save(apod);
   }
 
-  public getApod() {
+  public async getApod(): Promise<Apod> {
     let connection = getConnection();
     let repository = connection.getRepository(Apod);
+    let apod = await repository.createQueryBuilder("apod").getOne();
 
-    return repository.createQueryBuilder("apod").getOne();
+    if (apod == null) {
+      throw new Error("No APOD available.");
+    } else {
+      return apod;
+    }
   }
 
-  public async getRandomApod() {
+  public async getRandomApod(): Promise<Apod> {
     try {
       let dataRecovered = await axios.get(this.URL_RANDOM);
       if (dataRecovered.data.length) {
@@ -30,6 +44,7 @@ export class ApodDatasource {
         apod.title = dataRecovered.data[0].title;
         apod.explanation = dataRecovered.data[0].explanation;
         apod.mediaType = dataRecovered.data[0].media_type;
+
         return apod;
       } else if (dataRecovered.data) {
         let apod = new Apod();
@@ -37,6 +52,7 @@ export class ApodDatasource {
         apod.title = dataRecovered.data.title;
         apod.explanation = dataRecovered.data.explanation;
         apod.mediaType = dataRecovered.data.media_type;
+
         return apod;
       } else {
         throw new Error("Unable to recover data.");

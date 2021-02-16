@@ -1,9 +1,12 @@
 import { expect } from "chai";
 import "mocha";
+import { UserDatasource } from "../../data/datasource/user.datasource";
 import { User } from "../../data/entity/user.entity";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
 
+const userDatasource = new UserDatasource();
 const userSubscription = new UserSubscription();
+
 describe("Subscribe user", () => {
   it("Should return a true when the user is subscribed", async () => {
     let user = new User();
@@ -12,18 +15,44 @@ describe("Subscribe user", () => {
     expect(await userSubscription.subscribeUser(user)).to.be.true;
   });
 
-  it("Should return error when subscribing the user fails", async () => {
-    const user = new User();
+  it("Should save user id", async () => {
+    let user = new User();
     user.firstName = "Rorschasch";
-    user.id = 123;
-    try {
-      return await userSubscription.subscribeUser(user);
-    } catch (error) {
-      expect(error.message).to.be.eq("Failed to subscribe user.");
-    }
+    user.id = 123445;
+    await userSubscription.subscribeUser(user);
+    let saved = await userDatasource.findUserById(user.id);
+    expect(saved!.id).to.be.eq(user.id);
   });
 
-  it("Should return 'User already registered", async () => {
+  it("Should save user firstName", async () => {
+    let user = new User();
+    user.firstName = "Rorschasch";
+    user.id = 123445;
+    await userSubscription.subscribeUser(user);
+    let saved = await userDatasource.findUserById(user.id);
+    expect(saved!.firstName).to.be.eq(user.firstName);
+  });
+
+  it("Should save user as active true when subscribing", async () => {
+    let user = new User();
+    user.firstName = "Rorschasch";
+    user.id = 123445;
+    await userSubscription.subscribeUser(user);
+    let saved = await userDatasource.findUserById(user.id);
+    expect(saved!.isActive).to.be.true;
+  });
+
+  it("Should save user as active false when unsubscribing", async () => {
+    let user = new User();
+    user.firstName = "Rorschasch";
+    user.id = 123445;
+    await userSubscription.subscribeUser(user);
+    await userSubscription.unsubscribeUser(user);
+    let saved = await userDatasource.findUserById(user.id);
+    expect(saved!.isActive).to.be.false;
+  });
+
+  it("Should return 'User already subscribed", async () => {
     let user = new User();
     user.firstName = "Rorschasch";
     user.id = 123;
@@ -31,7 +60,7 @@ describe("Subscribe user", () => {
     try {
       await userSubscription.subscribeUser(user);
     } catch (error) {
-      expect(error);
+      expect(error.message).to.be.eq("User already subscribed.");
       return;
     }
     expect.fail("Should have thrown an error");

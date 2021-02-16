@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha -r ts-node/register 'src/tests/**/*.ts'",
     "start:dev": "ts-node src/index.ts",
-    "start": "node src/index",
+    "start": "npm run build && node src/index",
     "typeorm": "ts-node './node_modules/typeorm/cli.js'"
   },
   "repository": {

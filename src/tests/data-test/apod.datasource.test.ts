@@ -96,4 +96,32 @@ describe("Apod datasource ", async () => {
     await apodDatasource.setApod(apod);
     expect(await apodDatasource.getApod()).to.be.instanceOf(Apod);
   });
+
+  it("Should save apod title", async () => {
+    let apod = fakeApod();
+    await apodDatasource.setApod(apod);
+    let saved = await apodDatasource.getApod();
+    expect(saved!.title).to.be.eq(apod.title);
+  });
+
+  it("Should save apod explanation", async () => {
+    let apod = fakeApod();
+    await apodDatasource.setApod(apod);
+    let saved = await apodDatasource.getApod();
+    expect(saved!.explanation).to.be.eq(apod.explanation);
+  });
+
+  it("Should save apod url", async () => {
+    let apod = fakeApod();
+    await apodDatasource.setApod(apod);
+    let saved = await apodDatasource.getApod();
+    expect(saved!.url).to.be.eq(apod.url);
+  });
+
+  it("Should save apod media_type", async () => {
+    let apod = fakeApod();
+    await apodDatasource.setApod(apod);
+    let saved = await apodDatasource.getApod();
+    expect(saved!.mediaType).to.be.eq(apod.mediaType);
+  });
 });
