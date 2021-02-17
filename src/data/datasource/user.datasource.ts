@@ -1,4 +1,9 @@
-import { getConnection, InsertResult, UpdateResult } from "typeorm";
+import {
+  getRepository,
+  InsertResult,
+  getConnection,
+  UpdateResult,
+} from "typeorm";
 import { User } from "../entity/user.entity";
 
 export class UserDatasource {
@@ -43,9 +48,19 @@ export class UserDatasource {
     }
   }
 
-  public async deleteUser(user: User): Promise<UpdateResult> {
-    const connection = getConnection();
-    const repository = connection.getRepository(User);
+  async getAll() {
+    const repository = getRepository(User);
+
+    let users = await repository.find({ where: { isActive: true } });
+    if (users == null) {
+      throw new Error("User not found.");
+    } else {
+      return users;
+    }
+  }
+
+  async deleteUser(user: User): Promise<UpdateResult> {
+    const repository = getRepository(User);
 
     return await repository.update(user.telegramId, { isActive: false });
   }

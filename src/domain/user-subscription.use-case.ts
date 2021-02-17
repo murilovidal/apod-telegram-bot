@@ -23,4 +23,15 @@ export class UserSubscription {
       }
     }
   }
+
+  async getAllSubscribers() {
+    try {
+      var users = await this.userDatasource.getAll();
+    } catch (error) {
+      console.error(error);
+      throw new Error("Query failed.");
+    }
+
+    return users;
+  }
 }

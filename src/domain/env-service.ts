@@ -1,8 +1,14 @@
 require("dotenv").config();
 
 export class EnvService {
-  public URL_API = <string>process.env.URL_API;
-  public BOT_KEY = <string>process.env.BOT_KEY;
-  public API_KEY = <string>process.env.API_KEY;
-  public URL_RANDOM = `${this.URL_API + this.API_KEY}&count=1`;
+  BASE_URL: string;
+  URL_RANDOM: string;
+  BOT_TOKEN: string;
+
+  constructor() {
+    this.BASE_URL = <string>process.env.URL_API + <string>process.env.API_KEY;
+    this.URL_RANDOM =
+      <string>process.env.URL_API + <string>process.env.API_KEY + "&count=1";
+    this.BOT_TOKEN = <string>process.env.BOT_TOKEN;
+  }
 }
