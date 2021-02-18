@@ -2,49 +2,18 @@ import "mocha";
 import { expect } from "chai";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { User } from "../../data/entity/user.entity";
-import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
+import { UserSubscription } from "../../domain/user-subscription.use-case";
 
-describe("Subscribe user", () => {
+describe("Unsubscribe user", () => {
   let userDatasource: UserDatasource;
   let userSubscription: UserSubscription;
   let userUnsubscription: UserUnsubscription;
 
   before(() => {
     userDatasource = new UserDatasource();
-    userSubscription = new UserSubscription();
     userUnsubscription = new UserUnsubscription();
-  });
-
-  it("Should return a true when the user is subscribed", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123445;
-
-    expect(await userSubscription.subscribeUser(user)).to.be.true;
-  });
-
-  it("Should save user when it subscribes first time", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123445;
-
-    await userSubscription.subscribeUser(user);
-    const saved = await userDatasource.findUserById(user.telegramId);
-
-    expect(saved!.telegramId).to.be.eq(user.telegramId);
-    expect(saved!.firstName).to.be.eq(user.firstName);
-  });
-
-  it("Should save user as active true when subscribing", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123445;
-
-    await userSubscription.subscribeUser(user);
-    const saved = await userDatasource.findUserById(user.telegramId);
-
-    expect(saved!.isActive).to.be.true;
+    userSubscription = new UserSubscription();
   });
 
   it("Should save user as active false when unsubscribing", async () => {

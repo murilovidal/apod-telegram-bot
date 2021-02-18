@@ -4,28 +4,33 @@ import { ApodDatasource } from "../../data/datasource/apod.datasource";
 import { expect } from "chai";
 import { Apod } from "../../data/entity/apod.entity";
 
-const apodDatasource = new ApodDatasource();
 function fakeApod() {
-  const apod = new Apod();
-  apod.url = "www.apod.com";
-  apod.title = "Death Star";
-  apod.explanation = "That's no moon.";
-  apod.mediaType = "image";
-  return apod;
+  let fakeApod = new Apod();
+
+  fakeApod.url = "www.apod.com";
+  fakeApod.title = "Death Star";
+  fakeApod.explanation = "That's no moon";
+  fakeApod.mediaType = "image";
+
+  return fakeApod;
 }
 
-beforeEach(async () => {
-  const connection = getConnection();
-  await connection.dropDatabase();
-  await connection.synchronize();
-});
-
 describe("Apod datasource ", async () => {
+  let apodDatasource: ApodDatasource;
+
+  before(() => {
+    apodDatasource = new ApodDatasource();
+  });
+
+  beforeEach(async () => {
+    const connection = getConnection();
+    await connection.dropDatabase();
+    await connection.synchronize();
+  });
+
   it("Should not save apod without url", async () => {
-    const apod = new Apod();
-    apod.title = "Death Star";
-    apod.explanation = "That's no moon.";
-    apod.mediaType = "image";
+    const apod = fakeApod();
+    apod.url = new Apod().url;
 
     try {
       await apodDatasource.setApod(apod);
@@ -42,10 +47,8 @@ describe("Apod datasource ", async () => {
   });
 
   it("Should not save apod without title", async () => {
-    const apod = new Apod();
-    apod.url = "www.apod.com";
-    apod.explanation = "That's no moon.";
-    apod.mediaType = "image";
+    const apod = fakeApod();
+    apod.title = new Apod().title;
 
     try {
       await apodDatasource.setApod(apod);
@@ -62,10 +65,8 @@ describe("Apod datasource ", async () => {
   });
 
   it("Should not save apod without explanation", async () => {
-    const apod = new Apod();
-    apod.url = "www.BlueDeathStar.com";
-    apod.title = "Blue Death Star";
-    apod.mediaType = "image";
+    const apod = fakeApod();
+    apod.explanation = new Apod().explanation;
 
     try {
       await apodDatasource.setApod(apod);
@@ -82,10 +83,8 @@ describe("Apod datasource ", async () => {
   });
 
   it("Should not save apod without media type", async () => {
-    const apod = new Apod();
-    apod.url = "www.BlueDeathStar.com";
-    apod.title = "Blue Death Star";
-    apod.explanation = "That's no moon.";
+    const apod = fakeApod();
+    apod.mediaType = new Apod().mediaType;
 
     try {
       await apodDatasource.setApod(apod);

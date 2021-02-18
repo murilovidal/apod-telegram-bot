@@ -93,7 +93,7 @@ describe("User datasource", () => {
 
     const result = await userDatasource.findUserByName(user.firstName);
 
-    expect(result).to.be.instanceOf(User);
+    expect(result.telegramId).to.be.equal(user.telegramId);
   });
 
   it("Should delete a user", async () => {

@@ -17,12 +17,7 @@ export class UserDatasource {
     const connection = getConnection();
     const repository = connection.getRepository(User);
 
-    return await repository
-      .createQueryBuilder()
-      .update()
-      .set({ isActive: true })
-      .where("telegramId = :telegramId", { telegramId: user.telegramId })
-      .execute();
+    return repository.update(user.telegramId, { isActive: true });
   }
 
   public async findUserById(id: number): Promise<User> {

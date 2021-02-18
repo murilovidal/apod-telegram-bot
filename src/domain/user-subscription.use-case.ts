@@ -21,14 +21,4 @@ export class UserSubscription {
       }
     }
   }
-
-  public async unsubscribeUser(user: User) {
-    try {
-      await this.userDatasource.deleteUser(user);
-      return true;
-    } catch (error) {
-      console.error(error);
-      throw new Error("Failed to unsubscribe user");
-    }
-  }
 }
