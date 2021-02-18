@@ -13,7 +13,7 @@ export class UserDatasource {
       .execute();
   }
 
-  async updateUser(_user: User): Promise<UpdateResult> {
+  async updateUser(user: User): Promise<UpdateResult> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
 
@@ -21,26 +21,26 @@ export class UserDatasource {
       .createQueryBuilder()
       .update()
       .set({ isActive: true })
-      .where("id = :id", { id: _user.id })
+      .where("id = :id", { id: user.id })
       .execute();
   }
 
-  async findUserById(_id: number): Promise<User> {
+  async findUserById(id: number): Promise<User> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
-    let user = await repository.findOne(_id);
+    const user = await repository.findOne(id);
 
-    if (user == null) {
+    if (!user) {
       throw new Error("User not found.");
     } else {
       return user;
     }
   }
 
-  async findUserByName(_name: string): Promise<User> {
+  async findUserByName(firstName: string): Promise<User> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
-    let user = await repository.findOne(_name);
+    const user = await repository.findOne({ where: { firstName: firstName } });
     if (user == null) {
       throw new Error("User not found.");
     } else {
@@ -49,8 +49,8 @@ export class UserDatasource {
   }
 
   async deleteUser(user: User): Promise<UpdateResult> {
-    let connection = getConnection();
-    let repository = connection.getRepository(User);
+    const connection = getConnection();
+    const repository = connection.getRepository(User);
 
     return await repository.update(user.id, { isActive: false });
   }

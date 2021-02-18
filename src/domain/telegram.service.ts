@@ -24,7 +24,7 @@ export class TelegramService {
     );
 
     bot.command("subscribe", async (ctx) => {
-      let user = this.getUserFromCtx(ctx);
+      const user = this.getUserFromCtx(ctx);
       try {
         await userSubscription.subscribeUser(user);
         this.sendTextMessageToUser(
@@ -48,7 +48,7 @@ export class TelegramService {
     });
 
     bot.command("unsubscribe", async (ctx) => {
-      let user = this.getUserFromCtx(ctx);
+      const user = this.getUserFromCtx(ctx);
       try {
         await userSubscription.unsubscribeUser(user);
         this.sendTextMessageToUser(
@@ -75,7 +75,7 @@ export class TelegramService {
   }
 
   protected getUserFromCtx(ctx: any) {
-    let user = new User();
+    const user = new User();
     user.id = ctx.message.chat.id;
     user.firstName = ctx.message.chat.first_name;
     return user;
