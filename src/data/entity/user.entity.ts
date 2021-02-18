@@ -8,10 +8,10 @@ import {
 
 @Entity({ name: "user" })
 export class User {
-  @PrimaryColumn({ nullable: false, unique: true })
-  id!: number;
+  @PrimaryColumn({ name: "telegram_id", nullable: false, unique: true })
+  telegramId!: number;
 
-  @Column({ nullable: false })
+  @Column({ name: "first_name", nullable: false })
   firstName!: string;
 
   @CreateDateColumn({ name: "created_at" })

@@ -2,11 +2,11 @@ import { User } from "../data/entity/user.entity";
 import { UserDatasource } from "../data/datasource/user.datasource";
 
 export class UserSubscription {
-  protected ALREADY_SUBSCRIBED_MESSAGE =
-    'QueryFailedError: duplicate key value violates unique constraint "PK_cace4a159ff9f2512dd42373760"';
-  protected userDatasource = new UserDatasource();
+  private ALREADY_SUBSCRIBED_MESSAGE =
+    'QueryFailedError: duplicate key value violates unique constraint "PK_c1ed111fba8a34b812d11f42352"';
+  private userDatasource = new UserDatasource();
 
-  async subscribeUser(user: User) {
+  public async subscribeUser(user: User) {
     try {
       await this.userDatasource.setUser(user);
       return true;
@@ -22,7 +22,7 @@ export class UserSubscription {
     }
   }
 
-  async unsubscribeUser(user: User) {
+  public async unsubscribeUser(user: User) {
     try {
       await this.userDatasource.deleteUser(user);
       return true;

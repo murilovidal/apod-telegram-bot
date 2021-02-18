@@ -3,13 +3,12 @@ import { User } from "../../data/entity/user.entity";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { createConnection, getConnection } from "typeorm";
 import { expect } from "chai";
-import { toASCII } from "punycode";
 
 const userDatasource = new UserDatasource();
 
 function fakeUser() {
   const user = new User();
-  user.id = 1984;
+  user.telegramId = 1984;
   user.firstName = "Beeblebrox";
   return user;
 }
@@ -30,13 +29,13 @@ beforeEach(async () => {
 describe("User datasource", () => {
   it("Should not save user without firstname", async () => {
     var user = new User();
-    user.id = 123;
+    user.telegramId = 123;
 
     try {
       await userDatasource.setUser(user);
     } catch (error) {
       expect(error.message).to.be.eq(
-        'null value in column "firstName" violates not-null constraint'
+        'null value in column "first_name" violates not-null constraint'
       );
       return;
     }
@@ -54,7 +53,7 @@ describe("User datasource", () => {
       await userDatasource.setUser(user);
     } catch (error) {
       expect(error.message).to.be.eq(
-        'null value in column "id" violates not-null constraint'
+        'null value in column "telegram_id" violates not-null constraint'
       );
       return;
     }
@@ -72,13 +71,13 @@ describe("User datasource", () => {
       await userDatasource.setUser(user);
     } catch (error) {
       expect(error.message).to.be.eq(
-        'duplicate key value violates unique constraint "PK_cace4a159ff9f2512dd42373760"'
+        'duplicate key value violates unique constraint "PK_c1ed111fba8a34b812d11f42352"'
       );
       return;
     }
 
     expect.fail(
-      'Should have thrown error: duplicate key value violates unique constraint "PK_cace4a159ff9f2512dd42373760"'
+      'Should have thrown error: duplicate key value violates unique constraint "PK_c1ed111fba8a34b812d11f42352"'
     );
   });
 
@@ -108,9 +107,9 @@ describe("User datasource", () => {
   it("Should save user sucessfully", async () => {
     const user = fakeUser();
     await userDatasource.setUser(user);
-    const savedUser = await userDatasource.findUserById(user.id);
+    const savedUser = await userDatasource.findUserById(user.telegramId);
 
-    expect(savedUser.id).to.be.eq(user.id);
+    expect(savedUser.telegramId).to.be.eq(user.telegramId);
     expect(savedUser.firstName).to.be.eq(user.firstName);
   });
 });

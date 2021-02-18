@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  AfterInsert,
 } from "typeorm";
 
 @Entity()
@@ -29,7 +28,7 @@ export class Apod {
   createdAt!: Date;
 
   @UpdateDateColumn({ name: "updated_at" })
-  UpdatedAt!: Date;
+  updatedAt!: Date;
 
   @DeleteDateColumn({ name: "deleted_at" })
   deletedAt!: Date;

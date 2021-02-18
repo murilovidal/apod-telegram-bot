@@ -1,15 +1,19 @@
 require("dotenv").config();
 import { Telegraf } from "telegraf";
 import { User } from "../data/entity/user.entity";
-import { UserSubscription } from "./user-subscription.use-case";
-
-const bot = new Telegraf(<string>process.env.BOT_TOKEN);
-const userSubscription = new UserSubscription();
+import { UserSubscription } from "../domain/user-subscription.use-case";
 
 export class TelegramService {
+  bot: Telegraf;
+  userSubscription: UserSubscription;
+
+  constructor() {
+    this.bot = new Telegraf(<string>process.env.BOT_TOKEN);
+    this.userSubscription = new UserSubscription();
+  }
   sendTextMessageToUser(user: User, messageToUser: string) {
     try {
-      bot.telegram.sendMessage(user.id, messageToUser);
+      this.bot.telegram.sendMessage(user.telegramId, messageToUser);
     } catch (e) {
       console.log(e);
       throw new Error("SendMessage Failed.");
@@ -17,16 +21,16 @@ export class TelegramService {
   }
 
   start() {
-    bot.start((ctx) =>
+    this.bot.start((ctx) =>
       ctx.reply(
         "Welcome! This bot retrieves the NASA's Picture of the Day on command. Use /image to receive the picture of the day from NASA or /random to receive a random picture"
       )
     );
 
-    bot.command("subscribe", async (ctx) => {
+    this.bot.command("subscribe", async (ctx) => {
       const user = this.getUserFromCtx(ctx);
       try {
-        await userSubscription.subscribeUser(user);
+        await this.userSubscription.subscribeUser(user);
         this.sendTextMessageToUser(
           user,
           "Subscription sucessful! You will receive the NASA's Astronomy Picture Of the Day automatically."
@@ -47,10 +51,10 @@ export class TelegramService {
       }
     });
 
-    bot.command("unsubscribe", async (ctx) => {
+    this.bot.command("unsubscribe", async (ctx) => {
       const user = this.getUserFromCtx(ctx);
       try {
-        await userSubscription.unsubscribeUser(user);
+        await this.userSubscription.unsubscribeUser(user);
         this.sendTextMessageToUser(
           user,
           "Unsubscription sucessful! You will NOT receive the NASA's Astronomy Picture Of the Day automatically."
@@ -64,19 +68,19 @@ export class TelegramService {
       }
     });
 
-    bot.help((ctx) =>
+    this.bot.help((ctx) =>
       ctx.reply(
         "Use /image to receive the picture of the day or /random to receive a random picture."
       )
     );
-    bot.launch();
-    process.once("SIGINT", () => bot.stop("SIGINT"));
-    process.once("SIGTERM", () => bot.stop("SIGTERM"));
+    this.bot.launch();
+    process.once("SIGINT", () => this.bot.stop("SIGINT"));
+    process.once("SIGTERM", () => this.bot.stop("SIGTERM"));
   }
 
   protected getUserFromCtx(ctx: any) {
     const user = new User();
-    user.id = ctx.message.chat.id;
+    user.telegramId = ctx.message.chat.id;
     user.firstName = ctx.message.chat.first_name;
     return user;
   }

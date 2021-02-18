@@ -1,6 +1,7 @@
 import { getConnection, UpdateResult } from "typeorm";
 import { Apod } from "../entity/apod.entity";
 import { EnvService } from "../../domain/env-service";
+import { ApodResponse } from "../entity/apod-response.entity";
 const axios = require("axios");
 
 export class ApodDatasource {
@@ -26,7 +27,7 @@ export class ApodDatasource {
   public async getApod(): Promise<Apod> {
     const connection = getConnection();
     const repository = connection.getRepository(Apod);
-    const apod = await repository.createQueryBuilder("apod").getOne();
+    const apod = await repository.findOne();
 
     if (apod == null) {
       throw new Error("No APOD available.");
@@ -37,26 +38,23 @@ export class ApodDatasource {
 
   public async getRandomApod(): Promise<Apod> {
     try {
+      let response;
       const dataRecovered = await axios.get(this.URL_RANDOM);
-      if (dataRecovered.data.length) {
-        const apod = new Apod();
-        apod.url = dataRecovered.data[0].url;
-        apod.title = dataRecovered.data[0].title;
-        apod.explanation = dataRecovered.data[0].explanation;
-        apod.mediaType = dataRecovered.data[0].media_type;
-
-        return apod;
-      } else if (dataRecovered.data) {
-        const apod = new Apod();
-        apod.url = dataRecovered.data.url;
-        apod.title = dataRecovered.data.title;
-        apod.explanation = dataRecovered.data.explanation;
-        apod.mediaType = dataRecovered.data.media_type;
-
-        return apod;
+      if (dataRecovered?.data?.length) {
+        response = dataRecovered.data[0];
+      } else if (dataRecovered?.data) {
+        response = dataRecovered.data;
       } else {
         throw new Error("Unable to recover data.");
       }
+      const apod = new Apod();
+
+      apod.url = response.url;
+      apod.title = response.title;
+      apod.explanation = response.explanation;
+      apod.mediaType = response.media_type;
+
+      return apod;
     } catch (e) {
       console.error(e);
       throw new Error("Failed to retrieve data from " + this.URL_RANDOM);

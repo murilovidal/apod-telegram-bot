@@ -2,18 +2,18 @@ import { getConnection, InsertResult, UpdateResult } from "typeorm";
 import { User } from "../entity/user.entity";
 
 export class UserDatasource {
-  async setUser(_user: User): Promise<InsertResult> {
+  public async setUser(user: User): Promise<InsertResult> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
 
     return await repository
       .createQueryBuilder()
       .insert()
-      .values([{ id: _user.id, firstName: _user.firstName }])
+      .values([{ telegramId: user.telegramId, firstName: user.firstName }])
       .execute();
   }
 
-  async updateUser(user: User): Promise<UpdateResult> {
+  public async updateUser(user: User): Promise<UpdateResult> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
 
@@ -21,11 +21,11 @@ export class UserDatasource {
       .createQueryBuilder()
       .update()
       .set({ isActive: true })
-      .where("id = :id", { id: user.id })
+      .where("telegramId = :telegramId", { telegramId: user.telegramId })
       .execute();
   }
 
-  async findUserById(id: number): Promise<User> {
+  public async findUserById(id: number): Promise<User> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
     const user = await repository.findOne(id);
@@ -37,7 +37,7 @@ export class UserDatasource {
     }
   }
 
-  async findUserByName(firstName: string): Promise<User> {
+  public async findUserByName(firstName: string): Promise<User> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
     const user = await repository.findOne({ where: { firstName: firstName } });
@@ -48,10 +48,10 @@ export class UserDatasource {
     }
   }
 
-  async deleteUser(user: User): Promise<UpdateResult> {
+  public async deleteUser(user: User): Promise<UpdateResult> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
 
-    return await repository.update(user.id, { isActive: false });
+    return await repository.update(user.telegramId, { isActive: false });
   }
 }

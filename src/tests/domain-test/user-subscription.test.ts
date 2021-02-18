@@ -16,7 +16,7 @@ describe("Subscribe user", () => {
   it("Should return a true when the user is subscribed", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
-    user.id = 123445;
+    user.telegramId = 123445;
 
     expect(await userSubscription.subscribeUser(user)).to.be.true;
   });
@@ -24,22 +24,22 @@ describe("Subscribe user", () => {
   it("Should save user when it subscribes first time", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
-    user.id = 123445;
+    user.telegramId = 123445;
 
     await userSubscription.subscribeUser(user);
-    const saved = await userDatasource.findUserById(user.id);
+    const saved = await userDatasource.findUserById(user.telegramId);
 
-    expect(saved!.id).to.be.eq(user.id);
+    expect(saved!.telegramId).to.be.eq(user.telegramId);
     expect(saved!.firstName).to.be.eq(user.firstName);
   });
 
   it("Should save user as active true when subscribing", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
-    user.id = 123445;
+    user.telegramId = 123445;
 
     await userSubscription.subscribeUser(user);
-    const saved = await userDatasource.findUserById(user.id);
+    const saved = await userDatasource.findUserById(user.telegramId);
 
     expect(saved!.isActive).to.be.true;
   });
@@ -47,11 +47,11 @@ describe("Subscribe user", () => {
   it("Should save user as active false when unsubscribing", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
-    user.id = 123445;
+    user.telegramId = 123445;
     await userSubscription.subscribeUser(user);
 
     await userSubscription.unsubscribeUser(user);
-    const saved = await userDatasource.findUserById(user.id);
+    const saved = await userDatasource.findUserById(user.telegramId);
 
     expect(saved!.isActive).to.be.false;
   });
@@ -59,7 +59,7 @@ describe("Subscribe user", () => {
   it("Should return 'User already subscribed", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
-    user.id = 123;
+    user.telegramId = 123;
     await userSubscription.subscribeUser(user);
 
     try {
@@ -75,7 +75,7 @@ describe("Subscribe user", () => {
   it("Should return a true when the user is unsubscribed", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
-    user.id = 123445;
+    user.telegramId = 123445;
 
     await userSubscription.subscribeUser(user);
 
@@ -85,7 +85,7 @@ describe("Subscribe user", () => {
   it("Should return error when unsubscribing the user fails", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
-    user.id = 123;
+    user.telegramId = 123;
 
     await userSubscription.subscribeUser(user);
 
