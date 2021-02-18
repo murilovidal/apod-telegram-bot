@@ -2,6 +2,9 @@ import "mocha";
 import { User } from "../../data/entity/user.entity";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { getConnection } from "typeorm";
+import { expect } from "chai";
+import * as chai from "chai";
+import * as chaiAsPromised from "chai-as-promised";
 
 function fakeUser() {
   const user = new User();
@@ -11,15 +14,11 @@ function fakeUser() {
 }
 
 describe("User datasource", () => {
-  let userDatasource: UserDatasource;
-  const chai = require("chai");
-  const chaiAsPromised = require("chai-as-promised");
   chai.use(chaiAsPromised);
-  const expect = chai.expect;
+  let userDatasource: UserDatasource;
 
   before(async () => {
     userDatasource = new UserDatasource();
-
     await userDatasource.setUser(fakeUser());
   });
 

@@ -4,12 +4,12 @@ import { User } from "../../data/entity/user.entity";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { getConnection } from "typeorm";
+import { expect } from "chai";
+import * as chai from "chai";
+import * as chaiAsPromised from "chai-as-promised";
 
 describe("Unsubscribe user", () => {
-  const chai = require("chai");
-  const chaiAsPromised = require("chai-as-promised");
   chai.use(chaiAsPromised);
-  const expect = chai.expect;
   let userDatasource: UserDatasource;
   let userSubscriptionUseCase: UserSubscription;
   let userUnsubscriptionUseCase: UserUnsubscription;

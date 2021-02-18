@@ -2,6 +2,9 @@ import "mocha";
 import { createConnection, getConnection } from "typeorm";
 import { ApodDatasource } from "../../data/datasource/apod.datasource";
 import { Apod } from "../../data/entity/apod.entity";
+import { expect } from "chai";
+import * as chai from "chai";
+import * as chaiAsPromised from "chai-as-promised";
 
 function fakeApod() {
   let fakeApod = new Apod();
@@ -15,10 +18,7 @@ function fakeApod() {
 }
 
 describe("Apod datasource ", async () => {
-  const chai = require("chai");
-  const chaiAsPromised = require("chai-as-promised");
   chai.use(chaiAsPromised);
-  const expect = chai.expect;
   let apodDatasource: ApodDatasource;
 
   before(async () => {
