@@ -1,16 +1,18 @@
 require("dotenv").config();
 import { Telegraf } from "telegraf";
 import { User } from "../data/entity/user.entity";
+import { EnvService } from "../domain/env-service";
 import { UserSubscription } from "../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../domain/user-unsubscription.use-case";
 
 export class TelegramService {
-  bot: Telegraf;
-  userSubscription: UserSubscription;
-  userUnsubscription: UserUnsubscription;
+  private bot: Telegraf;
+  private userSubscription: UserSubscription;
+  private userUnsubscription: UserUnsubscription;
+  protected envService = new EnvService();
 
   constructor() {
-    this.bot = new Telegraf(<string>process.env.BOT_TOKEN);
+    this.bot = new Telegraf(this.envService.BOT_KEY);
     this.userSubscription = new UserSubscription();
     this.userUnsubscription = new UserUnsubscription();
   }

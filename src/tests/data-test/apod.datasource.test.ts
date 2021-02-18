@@ -1,7 +1,6 @@
 import "mocha";
-import { getConnection } from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { ApodDatasource } from "../../data/datasource/apod.datasource";
-import { expect } from "chai";
 import { Apod } from "../../data/entity/apod.entity";
 
 function fakeApod() {
@@ -16,9 +15,16 @@ function fakeApod() {
 }
 
 describe("Apod datasource ", async () => {
+  const chai = require("chai");
+  const chaiAsPromised = require("chai-as-promised");
+  chai.use(chaiAsPromised);
+  const expect = chai.expect;
   let apodDatasource: ApodDatasource;
 
-  before(() => {
+  before(async () => {
+    const connection = await createConnection();
+    await connection.dropDatabase();
+    await connection.synchronize();
     apodDatasource = new ApodDatasource();
   });
 
@@ -32,17 +38,8 @@ describe("Apod datasource ", async () => {
     const apod = fakeApod();
     apod.url = new Apod().url;
 
-    try {
-      await apodDatasource.setApod(apod);
-    } catch (error) {
-      expect(error.message).to.be.eq(
-        'null value in column "url" violates not-null constraint'
-      );
-      return;
-    }
-
-    expect.fail(
-      'Should have thrown error:null value in column "id" violates not-null constraint'
+    expect(apodDatasource.setApod(apod)).to.eventually.throw(
+      new Error('null value in column "url" violates not-null constraint')
     );
   });
 
@@ -50,17 +47,8 @@ describe("Apod datasource ", async () => {
     const apod = fakeApod();
     apod.title = new Apod().title;
 
-    try {
-      await apodDatasource.setApod(apod);
-    } catch (error) {
-      expect(error.message).to.be.eq(
-        'null value in column "title" violates not-null constraint'
-      );
-      return;
-    }
-
-    expect.fail(
-      'Should have thrown error:null value in column "title" violates not-null constraint'
+    expect(apodDatasource.setApod(apod)).to.eventually.throw(
+      new Error('null value in column "title" violates not-null constraint')
     );
   });
 
@@ -68,17 +56,10 @@ describe("Apod datasource ", async () => {
     const apod = fakeApod();
     apod.explanation = new Apod().explanation;
 
-    try {
-      await apodDatasource.setApod(apod);
-    } catch (error) {
-      expect(error.message).to.be.eq(
+    expect(apodDatasource.setApod(apod)).to.eventually.throw(
+      new Error(
         'null value in column "explanation" violates not-null constraint'
-      );
-      return;
-    }
-
-    expect.fail(
-      'Should have thrown error:null value in column "explanation" violates not-null constraint'
+      )
     );
   });
 
@@ -86,17 +67,10 @@ describe("Apod datasource ", async () => {
     const apod = fakeApod();
     apod.mediaType = new Apod().mediaType;
 
-    try {
-      await apodDatasource.setApod(apod);
-    } catch (error) {
-      expect(error.message).to.be.eq(
+    expect(apodDatasource.setApod(apod)).to.eventually.throw(
+      new Error(
         'null value in column "media_type" violates not-null constraint'
-      );
-      return;
-    }
-
-    expect.fail(
-      'Should have thrown error:null value in column "media_type" violates not-null constraint'
+      )
     );
   });
 

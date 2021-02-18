@@ -1,7 +1,6 @@
-import { getConnection, UpdateResult } from "typeorm";
+import { getConnection } from "typeorm";
 import { Apod } from "../entity/apod.entity";
 import { EnvService } from "../../domain/env-service";
-import { ApodResponse } from "../entity/apod-response.entity";
 const axios = require("axios");
 
 export class ApodDatasource {
@@ -48,7 +47,6 @@ export class ApodDatasource {
         throw new Error("Unable to recover data.");
       }
       const apod = new Apod();
-
       apod.url = response.url;
       apod.title = response.title;
       apod.explanation = response.explanation;

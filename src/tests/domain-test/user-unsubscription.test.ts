@@ -1,47 +1,41 @@
 import "mocha";
-import { expect } from "chai";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { User } from "../../data/entity/user.entity";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
+import { getConnection } from "typeorm";
 
 describe("Unsubscribe user", () => {
+  const chai = require("chai");
+  const chaiAsPromised = require("chai-as-promised");
+  chai.use(chaiAsPromised);
+  const expect = chai.expect;
   let userDatasource: UserDatasource;
-  let userSubscription: UserSubscription;
-  let userUnsubscription: UserUnsubscription;
+  let userSubscriptionUseCase: UserSubscription;
+  let userUnsubscriptionUseCase: UserUnsubscription;
 
   before(() => {
     userDatasource = new UserDatasource();
-    userUnsubscription = new UserUnsubscription();
-    userSubscription = new UserSubscription();
+    userUnsubscriptionUseCase = new UserUnsubscription();
+    userSubscriptionUseCase = new UserSubscription();
+  });
+
+  beforeEach(async () => {
+    const connection = getConnection();
+    await connection.dropDatabase();
+    await connection.synchronize();
   });
 
   it("Should save user as active false when unsubscribing", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
     user.telegramId = 123445;
-    await userSubscription.subscribeUser(user);
+    await userSubscriptionUseCase.subscribeUser(user);
 
-    await userUnsubscription.unsubscribeUser(user);
+    await userUnsubscriptionUseCase.unsubscribeUser(user);
     const saved = await userDatasource.findUserById(user.telegramId);
 
     expect(saved!.isActive).to.be.false;
-  });
-
-  it("Should return 'User already subscribed", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123;
-    await userSubscription.subscribeUser(user);
-
-    try {
-      await userSubscription.subscribeUser(user);
-    } catch (error) {
-      expect(error.message).to.be.eq("User already subscribed.");
-      return;
-    }
-
-    expect.fail("Should have thrown an error");
   });
 
   it("Should return a true when the user is unsubscribed", async () => {
@@ -49,9 +43,9 @@ describe("Unsubscribe user", () => {
     user.firstName = "Rorschasch";
     user.telegramId = 123445;
 
-    await userSubscription.subscribeUser(user);
+    await userSubscriptionUseCase.subscribeUser(user);
 
-    expect(await userUnsubscription.unsubscribeUser(user)).to.be.true;
+    expect(await userUnsubscriptionUseCase.unsubscribeUser(user)).to.be.true;
   });
 
   it("Should return error when unsubscribing the user fails", async () => {
@@ -59,12 +53,11 @@ describe("Unsubscribe user", () => {
     user.firstName = "Rorschasch";
     user.telegramId = 123;
 
-    await userSubscription.subscribeUser(user);
+    await userSubscriptionUseCase.subscribeUser(user);
+    user.telegramId = 321;
 
-    try {
-      return await userUnsubscription.unsubscribeUser(user);
-    } catch (error) {
-      expect(error.message).to.be.eq("Error: Failed to unsubscribe user.");
-    }
+    expect(userUnsubscriptionUseCase.unsubscribeUser(user)).to.eventually.throw(
+      new Error("Failed to unsubscribe user.")
+    );
   });
 });
