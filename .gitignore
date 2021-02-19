@@ -1,9 +1,2 @@
-# ENV
 .env
-
-# Dependency directories
 node_modules/
-
-Vagrantfile
-.vagrant/
-ubuntu-bionic-18.04-cloudimg-console.log
