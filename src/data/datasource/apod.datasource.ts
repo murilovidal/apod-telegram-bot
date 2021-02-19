@@ -1,16 +1,16 @@
 import { getConnection, getRepository } from "typeorm";
 import { Apod } from "../entity/apod.entity";
-import { EnvService } from "../../domain/env-service";
+import { EnvService } from "../../service/env-service";
 const axios = require("axios");
 
 export class ApodDatasource {
-  BASE_URL: string;
+  APOD_URL: string;
   URL_RANDOM: string;
   protected envService: EnvService;
 
   constructor() {
     this.envService = new EnvService();
-    this.BASE_URL = this.envService.BASE_URL;
+    this.APOD_URL = this.envService.APOD_URL;
     this.URL_RANDOM = this.envService.URL_RANDOM;
   }
 
@@ -59,7 +59,7 @@ export class ApodDatasource {
   async getApodFromAPI(): Promise<Apod> {
     try {
       let response;
-      const dataRecovered = await axios.get(this.BASE_URL);
+      const dataRecovered = await axios.get(this.APOD_URL);
 
       if (dataRecovered?.data) {
         response = dataRecovered.data;
@@ -75,7 +75,7 @@ export class ApodDatasource {
       return apod;
     } catch (e) {
       console.error(e);
-      throw new Error("Failed to retrieve data from " + this.BASE_URL);
+      throw new Error("Failed to retrieve data from " + this.APOD_URL);
     }
   }
 

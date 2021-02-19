@@ -18,17 +18,17 @@ export class UserDatasource {
       .execute();
   }
 
-  public async updateUser(user: User): Promise<UpdateResult> {
+  public async activateUser(user: User): Promise<UpdateResult> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
 
     return repository.update(user.telegramId, { isActive: true });
   }
 
-  public async findUserById(id: number): Promise<User> {
+  public async findUserById(telegramId: number): Promise<User> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
-    const user = await repository.findOne(id);
+    const user = await repository.findOne(telegramId);
 
     if (!user) {
       throw new Error("User not found.");

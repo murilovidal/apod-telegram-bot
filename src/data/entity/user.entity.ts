@@ -8,9 +8,6 @@ import {
 
 @Entity({ name: "user" })
 export class User {
-  id(id: any, messageToUser: string) {
-    throw new Error("Method not implemented.");
-  }
   @PrimaryColumn({ name: "telegram_id", nullable: false, unique: true })
   telegramId!: number;
 

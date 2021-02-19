@@ -6,25 +6,27 @@ export class UserSubscription {
 
   public async subscribeUser(user: User) {
     try {
-      await this.userDatasource.setUser(user);
-      return true;
-    } catch (error) {
-      if (
-        /^QueryFailedError: duplicate key value violates unique constraint/.test(
-          error
-        )
-      ) {
-        console.log(error);
-        this.userDatasource.updateUser(user);
+      const newUser = await this.userDatasource.findUserById(user.telegramId);
+      if (newUser.isActive) {
         throw new Error("User already subscribed.");
-      } else {
-        console.error(error);
+      } else if (!newUser.isActive) {
+        try {
+          await this.userDatasource.activateUser(newUser);
+        } catch (error) {
+          throw new Error("Failed to subscribe user.");
+        }
+      }
+    } catch (error) {
+      try {
+        await this.userDatasource.setUser(user);
+      } catch (error) {
+        console.log(error);
         throw new Error("Failed to subscribe user.");
       }
     }
   }
 
-  async getAllSubscribers() {
+  public async getAllSubscribers() {
     try {
       var users = await this.userDatasource.getAll();
     } catch (error) {

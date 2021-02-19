@@ -26,14 +26,6 @@ describe("Subscribe user", () => {
     await connection.synchronize();
   });
 
-  it("Should return a true when the user is subscribed", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123445;
-
-    expect(await userSubscriptionUseCase.subscribeUser(user)).to.be.true;
-  });
-
   it("Should save user when it subscribes first time", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
@@ -42,8 +34,8 @@ describe("Subscribe user", () => {
     await userSubscriptionUseCase.subscribeUser(user);
     const saved = await userDatasource.findUserById(user.telegramId);
 
-    expect(saved!.telegramId).to.be.eq(user.telegramId);
-    expect(saved!.firstName).to.be.eq(user.firstName);
+    expect(saved.telegramId).to.be.eq(user.telegramId);
+    expect(saved.firstName).to.be.eq(user.firstName);
   });
 
   it("Should save user as active true when subscribing", async () => {
@@ -57,7 +49,7 @@ describe("Subscribe user", () => {
     expect(saved.isActive).to.be.true;
   });
 
-  it("Should return 'User already subscribed", async () => {
+  it("Should return 'User already subscribed when user is already saved and active", async () => {
     const user = new User();
     user.firstName = "Rorschasch";
     user.telegramId = 123;

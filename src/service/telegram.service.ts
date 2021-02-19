@@ -2,7 +2,7 @@ import { Telegraf } from "telegraf";
 import { ApodDatasource } from "../data/datasource/apod.datasource";
 import { Apod } from "../data/entity/apod.entity";
 import { User } from "../data/entity/user.entity";
-import { EnvService } from "../domain/env-service";
+import { EnvService } from "./env-service";
 import { UserSubscription } from "../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../domain/user-unsubscription.use-case";
 
@@ -20,7 +20,7 @@ export class TelegramService {
     this.userUnsubscriptionUseCase = new UserUnsubscription();
     this.apodDatasource = new ApodDatasource();
   }
-  
+
   start() {
     this.bot.start((ctx) =>
       ctx.reply(
@@ -166,7 +166,7 @@ export class TelegramService {
 
   private getUserFromCtx(ctx: any) {
     let user = new User();
-    user.id = ctx.message.chat.id;
+    user.telegramId = ctx.message.chat.id;
     user.firstName = ctx.message.chat.first_name;
     return user;
   }
