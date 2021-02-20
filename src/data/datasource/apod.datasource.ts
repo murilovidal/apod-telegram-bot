@@ -4,8 +4,8 @@ import { EnvService } from "../../service/env-service";
 const axios = require("axios");
 
 export class ApodDatasource {
-  APOD_URL: string;
-  URL_RANDOM: string;
+  private APOD_URL: string;
+  private URL_RANDOM: string;
   protected envService: EnvService;
 
   constructor() {
@@ -14,7 +14,7 @@ export class ApodDatasource {
     this.URL_RANDOM = this.envService.URL_RANDOM;
   }
 
-  async setApod(apod: Apod): Promise<Apod> {
+  public async setApod(apod: Apod): Promise<Apod> {
     const repository = getRepository(Apod);
 
     return repository.save(apod);
@@ -23,16 +23,21 @@ export class ApodDatasource {
   public async getApod(): Promise<Apod> {
     const connection = getConnection();
     const repository = connection.getRepository(Apod);
-    const apod = await repository.findOne();
-
-    if (apod == null) {
-      throw new Error("No APOD available.");
-    } else {
-      return apod;
+    try {
+      const apod = await repository.findOne();
+      if (apod) {
+        return apod;
+      } else {
+        const apod = await this.getApodFromAPI();
+        await this.setApod(apod);
+        return apod;
+      }
+    } catch (error) {
+      throw new Error("Failed to get apod.");
     }
   }
 
-  async getRandomApod(): Promise<Apod> {
+  public async getRandomApod(): Promise<Apod> {
     try {
       let response;
       const dataRecovered = await axios.get(this.URL_RANDOM);
@@ -56,7 +61,8 @@ export class ApodDatasource {
       throw new Error("Failed to retrieve data from " + this.URL_RANDOM);
     }
   }
-  async getApodFromAPI(): Promise<Apod> {
+
+  public async getApodFromAPI(): Promise<Apod> {
     try {
       let response;
       const dataRecovered = await axios.get(this.APOD_URL);
@@ -79,7 +85,7 @@ export class ApodDatasource {
     }
   }
 
-  async updateApod() {
+  public async updateApod() {
     const apod = await this.getApodFromAPI();
     await this.setApod(apod);
   }

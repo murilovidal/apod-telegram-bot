@@ -1,10 +1,10 @@
 import { createConnection } from "typeorm";
-import { TelegramService } from "./service/telegram.service";
+import { TelegramPresentation } from "./web/telegram-presentation";
 
-const telegramService = new TelegramService();
+const telegramPresentation = new TelegramPresentation();
 
 (async () => {
   const connection = await createConnection();
   await connection.synchronize();
-  telegramService.start();
+  telegramPresentation.startBotCommands();
 })();
