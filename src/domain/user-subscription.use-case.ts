@@ -1,29 +1,30 @@
 import { User } from "../data/entity/user.entity";
 import { UserDatasource } from "../data/datasource/user.datasource";
-import { TelegramService } from "../service/telegram.service";
+import { BotService } from "../service/bot.service";
 import { BotMessage } from "../web/bot.message";
 import { ErrorMessage } from "./error.message";
+import { SendTelegramMessage } from "./send-telegram-message.use-case";
 
 export class UserSubscription {
   private userDatasource: UserDatasource;
-  private telegramService: TelegramService;
+  private sendTelegramMessageUseCase: SendTelegramMessage;
 
   constructor() {
-    this.telegramService = new TelegramService();
+    this.sendTelegramMessageUseCase = new SendTelegramMessage();
     this.userDatasource = new UserDatasource();
   }
 
-  public async subscribeUser(user: User) {
+  public async subscribeUser(user: User): Promise<void> {
     try {
       const newUser = await this.userDatasource.findUserById(user.telegramId);
       if (newUser.isActive) {
-        this.telegramService.sendTextMessageToUser(
+        this.sendTelegramMessageUseCase.sendTextMessageToUser(
           newUser,
           BotMessage.AlreadySubscribed
         );
       } else if (!newUser.isActive) {
         await this.userDatasource.activateUser(newUser);
-        this.telegramService.sendTextMessageToUser(
+        this.sendTelegramMessageUseCase.sendTextMessageToUser(
           newUser,
           BotMessage.SubscriptionSuccessful
         );
@@ -31,20 +32,20 @@ export class UserSubscription {
     } catch (error) {
       if (error == ErrorMessage.UserNotFound) {
         await this.userDatasource.setUser(user);
-        this.telegramService.sendTextMessageToUser(
+        this.sendTelegramMessageUseCase.sendTextMessageToUser(
           user,
           BotMessage.SubscriptionSuccessful
         );
       }
       console.error(error);
-      this.telegramService.sendTextMessageToUser(
+      this.sendTelegramMessageUseCase.sendTextMessageToUser(
         user,
         BotMessage.SubscriptionFailed
       );
     }
   }
 
-  public async getAllSubscribers() {
+  public async getAllSubscribers(): Promise<User[]> {
     try {
       var users = await this.userDatasource.getAll();
     } catch (error) {

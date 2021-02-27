@@ -1,18 +1,21 @@
 import { Telegraf } from "telegraf";
 import { Apod } from "../data/entity/apod.entity";
 import { User } from "../data/entity/user.entity";
-import { EnvService } from "./env-service";
+import { BotService } from "../service/bot.service";
+import { EnvService } from "../service/env-service";
 import { BotMessage } from "../web/bot.message";
 
-export class TelegramService {
+export class SendTelegramMessage {
   private bot: Telegraf;
+  private botService: BotService;
   protected envService = new EnvService();
 
   constructor() {
-    this.bot = new Telegraf(this.envService.BOT_TOKEN);
+    this.botService = new BotService();
+    this.bot = this.botService.getBot();
   }
 
-  public sendTextMessageToUser(user: User, messageToUser: string) {
+  public sendTextMessageToUser(user: User, messageToUser: string): void {
     try {
       this.bot.telegram.sendMessage(user.telegramId, messageToUser);
     } catch (e) {
@@ -21,14 +24,7 @@ export class TelegramService {
     }
   }
 
-  public getUserFromCtx(ctx: any): User {
-    const user = new User();
-    user.telegramId = ctx.message.chat.id;
-    user.firstName = ctx.message.chat.first_name;
-    return user;
-  }
-
-  public async sendMediaToUser(user: User, apod: Apod) {
+  public async sendMediaToUser(user: User, apod: Apod): Promise<void> {
     try {
       if (apod.mediaType == "image") {
         await this.bot.telegram.sendPhoto(

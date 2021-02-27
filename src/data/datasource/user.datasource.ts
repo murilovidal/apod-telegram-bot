@@ -41,19 +41,20 @@ export class UserDatasource {
     const connection = getConnection();
     const repository = connection.getRepository(User);
     const user = await repository.findOne({ where: { firstName: firstName } });
-    if (user == null) {
+
+    if (!user) {
       throw new Error("User not found.");
     } else {
       return user;
     }
   }
 
-  async getAll() {
+  async getAll(): Promise<User[]> {
     const repository = getRepository(User);
 
     let users = await repository.find({ where: { isActive: true } });
-    if (users == null) {
-      throw new Error("User not found.");
+    if (!users) {
+      throw new Error("No user found.");
     } else {
       return users;
     }

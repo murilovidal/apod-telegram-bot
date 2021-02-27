@@ -85,7 +85,7 @@ export class ApodDatasource {
     }
   }
 
-  public async updateApod() {
+  public async updateApod(): Promise<void> {
     const apod = await this.getApodFromAPI();
     await this.setApod(apod);
   }
