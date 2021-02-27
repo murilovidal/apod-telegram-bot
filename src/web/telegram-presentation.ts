@@ -2,7 +2,6 @@ import { Telegraf } from "telegraf";
 import { ApodDatasource } from "../data/datasource/apod.datasource";
 import { UserSubscription } from "../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../domain/user-unsubscription.use-case";
-import { EnvService } from "../service/env-service";
 import { BotMessage } from "./bot.message";
 import { SendTelegramMessage } from "../domain/send-telegram-message.use-case";
 import { BotService } from "../service/bot.service";
@@ -12,12 +11,10 @@ export class TelegramPresentation {
   private userSubscriptionUseCase: UserSubscription;
   private userUnsubscriptionUseCase: UserUnsubscription;
   private apodDatasource: ApodDatasource;
-  protected envService: EnvService;
   private sendTelegramMessageUseCase: SendTelegramMessage;
   private botService: BotService;
 
   constructor() {
-    this.envService = new EnvService();
     this.botService = new BotService();
     this.bot = this.botService.getBot();
     this.apodDatasource = new ApodDatasource();
@@ -32,12 +29,32 @@ export class TelegramPresentation {
 
     this.bot.command("subscribe", async (ctx) => {
       const user = this.botService.getUserFromCtx(ctx);
-      await this.userSubscriptionUseCase.subscribeUser(user);
+      try {
+        this.sendTelegramMessageUseCase.sendTextMessageToUser(
+          user,
+          await this.userSubscriptionUseCase.subscribeUser(user)
+        );
+      } catch (error) {
+        await this.sendTelegramMessageUseCase.sendTextMessageToUser(
+          user,
+          BotMessage.SubscriptionFailed
+        );
+      }
     });
 
     this.bot.command("unsubscribe", async (ctx) => {
       const user = this.botService.getUserFromCtx(ctx);
-      await this.userUnsubscriptionUseCase.unsubscribeUser(user);
+      try {
+        this.sendTelegramMessageUseCase.sendTextMessageToUser(
+          user,
+          await this.userUnsubscriptionUseCase.unsubscribeUser(user)
+        );
+      } catch (error) {
+        await this.sendTelegramMessageUseCase.sendTextMessageToUser(
+          user,
+          BotMessage.UnsubscriptionFailed
+        );
+      }
     });
 
     this.bot.command("image", async (ctx) => {

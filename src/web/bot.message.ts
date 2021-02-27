@@ -7,4 +7,5 @@ export const enum BotMessage {
   SubscriptionUnsuccessful = "Unable to complete unsubscription. Please try again later.",
   Help = "Use /image to receive the picture of the day or /random to receive a random picture.",
   FailedToSendApod = "Failed to recover the image of the day. :(",
+  UnsubscriptionFailed = "Unable to complete unsubscription. Please try again later.",
 }

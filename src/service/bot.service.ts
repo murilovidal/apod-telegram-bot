@@ -4,7 +4,7 @@ import { EnvService } from "./env-service";
 
 export class BotService {
   private bot: Telegraf;
-  protected envService = new EnvService();
+  private envService = new EnvService();
 
   constructor() {
     this.bot = new Telegraf(this.envService.BOT_TOKEN);
