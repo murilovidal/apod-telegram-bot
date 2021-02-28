@@ -20,8 +20,7 @@ export class UserSubscription {
         return BotMessage.SubscriptionSuccessful;
       }
     } catch (error) {
-      console.log(error.message);
-
+      console.error(error.message);
       if (error.message == ErrorMessage.UserNotFound) {
         await this.userDatasource.setUser(user);
 

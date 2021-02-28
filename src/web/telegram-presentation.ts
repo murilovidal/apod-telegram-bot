@@ -29,32 +29,18 @@ export class TelegramPresentation {
 
     this.bot.command("subscribe", async (ctx) => {
       const user = this.botService.getUserFromCtx(ctx);
-      try {
-        this.sendTelegramMessageUseCase.sendTextMessageToUser(
-          user,
-          await this.userSubscriptionUseCase.subscribeUser(user)
-        );
-      } catch (error) {
-        await this.sendTelegramMessageUseCase.sendTextMessageToUser(
-          user,
-          BotMessage.SubscriptionFailed
-        );
-      }
+      this.sendTelegramMessageUseCase.sendTextMessageToUser(
+        user,
+        await this.userSubscriptionUseCase.subscribeUser(user)
+      );
     });
 
     this.bot.command("unsubscribe", async (ctx) => {
       const user = this.botService.getUserFromCtx(ctx);
-      try {
-        this.sendTelegramMessageUseCase.sendTextMessageToUser(
-          user,
-          await this.userUnsubscriptionUseCase.unsubscribeUser(user)
-        );
-      } catch (error) {
-        await this.sendTelegramMessageUseCase.sendTextMessageToUser(
-          user,
-          BotMessage.UnsubscriptionFailed
-        );
-      }
+      this.sendTelegramMessageUseCase.sendTextMessageToUser(
+        user,
+        await this.userUnsubscriptionUseCase.unsubscribeUser(user)
+      );
     });
 
     this.bot.command("image", async (ctx) => {
