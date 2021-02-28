@@ -92,4 +92,24 @@ describe("Apod datasource ", async () => {
     expect(saved!.url).to.be.eq(apod.url);
     expect(saved!.mediaType).to.be.eq(apod.mediaType);
   });
+
+  it("Should get a random apod with title", async () => {
+    let apod = await apodDatasource.getRandomApod();
+    expect(apod.title).to.exist;
+  });
+
+  it("Should get a random apod with url", async () => {
+    let apod = await apodDatasource.getRandomApod();
+    expect(apod.url).to.exist;
+  });
+
+  it("Should get a random apod with explanation", async () => {
+    let apod = await apodDatasource.getRandomApod();
+    expect(apod.explanation).to.exist;
+  });
+
+  it("Should get a random apod with media type", async () => {
+    let apod = await apodDatasource.getRandomApod();
+    expect(apod.mediaType).to.exist;
+  });
 });

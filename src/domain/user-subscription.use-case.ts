@@ -1,25 +1,34 @@
 import { User } from "../data/entity/user.entity";
 import { UserDatasource } from "../data/datasource/user.datasource";
+import { BotMessage } from "../web/bot.message";
+import { ErrorMessage } from "./error.message";
 
 export class UserSubscription {
-  private userDatasource = new UserDatasource();
+  private userDatasource: UserDatasource;
 
-  public async subscribeUser(user: User) {
+  constructor() {
+    this.userDatasource = new UserDatasource();
+  }
+
+  public async subscribeUser(user: User): Promise<string> {
     try {
-      await this.userDatasource.setUser(user);
-      return true;
+      const newUser = await this.userDatasource.findUserById(user.telegramId);
+      if (newUser.isActive) {
+        return BotMessage.AlreadySubscribed;
+      } else {
+        await this.userDatasource.activateUser(newUser);
+        return BotMessage.SubscriptionSuccessful;
+      }
     } catch (error) {
-      if (
-        /^QueryFailedError: duplicate key value violates unique constraint/.test(
-          error
-        )
-      ) {
-        console.log(error);
-        this.userDatasource.updateUser(user);
-        throw new Error("User already subscribed.");
+      console.error(error.message);
+      if (error.message == ErrorMessage.UserNotFound) {
+        await this.userDatasource.setUser(user);
+
+        return BotMessage.SubscriptionSuccessful;
       } else {
         console.error(error);
-        throw new Error("Failed to subscribe user.");
+
+        return BotMessage.SubscriptionFailed;
       }
     }
   }

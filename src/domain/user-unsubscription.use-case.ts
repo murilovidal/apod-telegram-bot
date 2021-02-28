@@ -1,16 +1,21 @@
 import { User } from "../data/entity/user.entity";
 import { UserDatasource } from "../data/datasource/user.datasource";
+import { BotMessage } from "../web/bot.message";
 
 export class UserUnsubscription {
-  private userDatasource = new UserDatasource();
+  private userDatasource: UserDatasource;
 
-  public async unsubscribeUser(user: User) {
+  constructor() {
+    this.userDatasource = new UserDatasource();
+  }
+
+  public async unsubscribeUser(user: User): Promise<string> {
     try {
       await this.userDatasource.deleteUser(user);
-      return true;
+      return BotMessage.UnsubscriptionSuccessful;
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to unsubscribe user");
+      return BotMessage.SubscriptionUnsuccessful;
     }
   }
 }

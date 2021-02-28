@@ -1,4 +1,9 @@
-import { getConnection, InsertResult, UpdateResult } from "typeorm";
+import {
+  getRepository,
+  InsertResult,
+  getConnection,
+  UpdateResult,
+} from "typeorm";
 import { User } from "../entity/user.entity";
 
 export class UserDatasource {
@@ -13,17 +18,17 @@ export class UserDatasource {
       .execute();
   }
 
-  public async updateUser(user: User): Promise<UpdateResult> {
+  public async activateUser(user: User): Promise<UpdateResult> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
 
     return repository.update(user.telegramId, { isActive: true });
   }
 
-  public async findUserById(id: number): Promise<User> {
+  public async findUserById(telegramId: number): Promise<User> {
     const connection = getConnection();
     const repository = connection.getRepository(User);
-    const user = await repository.findOne(id);
+    const user = await repository.findOne(telegramId);
 
     if (!user) {
       throw new Error("User not found.");
@@ -36,16 +41,27 @@ export class UserDatasource {
     const connection = getConnection();
     const repository = connection.getRepository(User);
     const user = await repository.findOne({ where: { firstName: firstName } });
-    if (user == null) {
+
+    if (!user) {
       throw new Error("User not found.");
     } else {
       return user;
     }
   }
 
-  public async deleteUser(user: User): Promise<UpdateResult> {
-    const connection = getConnection();
-    const repository = connection.getRepository(User);
+  async getAll(): Promise<User[]> {
+    const repository = getRepository(User);
+
+    let users = await repository.find({ where: { isActive: true } });
+    if (!users) {
+      throw new Error("No user found.");
+    } else {
+      return users;
+    }
+  }
+
+  async deleteUser(user: User): Promise<UpdateResult> {
+    const repository = getRepository(User);
 
     return await repository.update(user.telegramId, { isActive: false });
   }
