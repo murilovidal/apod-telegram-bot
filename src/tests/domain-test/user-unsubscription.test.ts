@@ -6,7 +6,9 @@ import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
-import * as chaiAsPromised from "chai-as-promised";
+import chaiAsPromised from "chai-as-promised";
+import { ErrorMessage } from "../../domain/error.message";
+import { BotMessage } from "../../web/bot.message";
 
 describe("Unsubscribe user", () => {
   chai.use(chaiAsPromised);
@@ -45,7 +47,9 @@ describe("Unsubscribe user", () => {
 
     await userSubscriptionUseCase.subscribeUser(user);
 
-    expect(await userUnsubscriptionUseCase.unsubscribeUser(user)).to.be.true;
+    expect(userUnsubscriptionUseCase.unsubscribeUser(user)).to.eventually.throw(
+      new Error(BotMessage.UnsubscriptionSuccessful)
+    );
   });
 
   it("Should return error when unsubscribing the user fails", async () => {

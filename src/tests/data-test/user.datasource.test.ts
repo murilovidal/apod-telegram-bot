@@ -4,7 +4,7 @@ import { UserDatasource } from "../../data/datasource/user.datasource";
 import { getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
-import * as chaiAsPromised from "chai-as-promised";
+import chaiAsPromised from "chai-as-promised";
 
 function fakeUser() {
   const user = new User();
