@@ -1,20 +1,22 @@
 import "mocha";
 import { getConnection } from "typeorm";
 import { UserDatasource } from "../../data/datasource/user.datasource";
-import { User } from "../../data/entity/user.entity";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
 import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
+import { Fakes } from "../fixtures/fakes.helper";
 
 describe("Subscribe user", () => {
   chai.use(chaiAsPromised);
   let userDatasource: UserDatasource;
   let userSubscriptionUseCase: UserSubscription;
   let userUnsubscriptionUseCase: UserUnsubscription;
+  let fakes: Fakes;
 
   before(() => {
+    fakes = new Fakes();
     userDatasource = new UserDatasource();
     userSubscriptionUseCase = new UserSubscription();
     userUnsubscriptionUseCase = new UserUnsubscription();
@@ -27,9 +29,7 @@ describe("Subscribe user", () => {
   });
 
   it("Should save user when it subscribes first time", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123445;
+    const user = fakes.user;
 
     await userSubscriptionUseCase.subscribeUser(user);
     const saved = await userDatasource.findUserById(user.telegramId);
@@ -39,9 +39,7 @@ describe("Subscribe user", () => {
   });
 
   it("Should save user as active true when subscribing", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123445;
+    const user = fakes.user;
 
     await userSubscriptionUseCase.subscribeUser(user);
     const saved = await userDatasource.findUserById(user.telegramId);
@@ -50,9 +48,7 @@ describe("Subscribe user", () => {
   });
 
   it("Should return 'User already subscribed when user is already saved and active", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123;
+    const user = fakes.user;
 
     await userSubscriptionUseCase.subscribeUser(user);
 

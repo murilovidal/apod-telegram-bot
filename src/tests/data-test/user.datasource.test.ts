@@ -5,21 +5,17 @@ import { getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-
-function fakeUser() {
-  const user = new User();
-  user.telegramId = 1984;
-  user.firstName = "Beeblebrox";
-  return user;
-}
+import { Fakes } from "../fixtures/fakes.helper";
 
 describe("User datasource", () => {
   chai.use(chaiAsPromised);
   let userDatasource: UserDatasource;
+  let fakes: Fakes;
 
   before(async () => {
     userDatasource = new UserDatasource();
-    await userDatasource.setUser(fakeUser());
+    fakes = new Fakes();
+    await userDatasource.setUser(fakes.user);
   });
 
   beforeEach(async () => {
@@ -29,7 +25,7 @@ describe("User datasource", () => {
   });
 
   it("Should not save user without firstname", () => {
-    var user = new User();
+    const user = new User();
     user.telegramId = 123;
 
     expect(userDatasource.setUser(user)).to.eventually.throw(
@@ -51,7 +47,7 @@ describe("User datasource", () => {
   });
 
   it("Should not save user with same id", async () => {
-    var user = fakeUser();
+    const user = fakes.user;
     await userDatasource.setUser(user);
 
     expect(userDatasource.setUser(user)).to.eventually.throw(
@@ -62,13 +58,15 @@ describe("User datasource", () => {
   });
 
   it("Should return a user searched by id", async () => {
-    await userDatasource.setUser(fakeUser());
+    await userDatasource.setUser(fakes.user);
 
-    expect(await userDatasource.findUserById(1984)).to.be.instanceOf(User);
+    expect(
+      await userDatasource.findUserById(fakes.user.telegramId)
+    ).to.be.instanceOf(User);
   });
 
   it("Should return a user searched by name", async () => {
-    const user = fakeUser();
+    const user = fakes.user;
     await userDatasource.setUser(user);
 
     const result = await userDatasource.findUserByName(user.firstName);
@@ -77,7 +75,7 @@ describe("User datasource", () => {
   });
 
   it("Should delete a user", async () => {
-    const user = fakeUser();
+    const user = fakes.user;
 
     await userDatasource.setUser(user);
 
@@ -85,7 +83,7 @@ describe("User datasource", () => {
   });
 
   it("Should save user sucessfully", async () => {
-    const user = fakeUser();
+    const user = fakes.user;
     await userDatasource.setUser(user);
 
     const savedUser = await userDatasource.findUserById(user.telegramId);

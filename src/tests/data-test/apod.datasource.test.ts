@@ -88,7 +88,7 @@ describe("Apod datasource ", async () => {
   it("Should get a random apod with title", async () => {
     sinon.stub(axios, "get").callsFake(async () => ApodFixture);
 
-    let apod = await apodDatasource.getRandomApod();
+    const apod = await apodDatasource.getRandomApod();
 
     expect(apod.title).to.exist;
   });
@@ -96,27 +96,27 @@ describe("Apod datasource ", async () => {
   it("Should get a random apod with url", async () => {
     sinon.stub(axios, "get").callsFake(async () => ApodFixture);
 
-    let apod = await apodDatasource.getRandomApod();
+    const apod = await apodDatasource.getRandomApod();
     expect(apod.url).to.exist;
   });
 
   it("Should get a random apod with explanation", async () => {
     sinon.stub(axios, "get").callsFake(async () => ApodFixture);
 
-    let apod = await apodDatasource.getRandomApod();
+    const apod = await apodDatasource.getRandomApod();
     expect(apod.explanation).to.exist;
   });
 
   it("Should get a random apod with media type", async () => {
     sinon.stub(axios, "get").callsFake(async () => ApodFixture);
 
-    let apod = await apodDatasource.getRandomApod();
+    const apod = await apodDatasource.getRandomApod();
     expect(apod.mediaType).to.exist;
   });
 });
 
 function fakeApod() {
-  let fakeApod = new Apod();
+  const fakeApod = new Apod();
 
   fakeApod.url = "www.apod.com";
   fakeApod.title = "Death Star";

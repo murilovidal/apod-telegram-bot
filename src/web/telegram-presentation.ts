@@ -29,7 +29,7 @@ export class TelegramPresentation {
 
     this.bot.command("subscribe", async (ctx) => {
       const user = this.botService.getUserFromCtx(ctx);
-      this.sendTelegramMessageUseCase.sendTextMessageToUser(
+      this.sendTelegramMessageUseCase.sendTextToUser(
         user,
         await this.userSubscriptionUseCase.subscribeUser(user)
       );
@@ -37,7 +37,7 @@ export class TelegramPresentation {
 
     this.bot.command("unsubscribe", async (ctx) => {
       const user = this.botService.getUserFromCtx(ctx);
-      this.sendTelegramMessageUseCase.sendTextMessageToUser(
+      this.sendTelegramMessageUseCase.sendTextToUser(
         user,
         await this.userUnsubscriptionUseCase.unsubscribeUser(user)
       );
