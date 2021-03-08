@@ -1,4 +1,5 @@
 import { Telegraf } from "telegraf";
+import { Message } from "telegraf/typings/telegram-types";
 import { User } from "../data/entity/user.entity";
 import { EnvService } from "./env-service";
 
@@ -12,16 +13,16 @@ export class BotService {
   public async sendText(
     telegramId: number,
     messageToUser: string
-  ): Promise<void> {
-    this.bot.telegram.sendMessage(telegramId, messageToUser);
+  ): Promise<Message.TextMessage> {
+    return this.bot.telegram.sendMessage(telegramId, messageToUser);
   }
 
   public async sendMedia(
     telegramId: number,
     url: string,
     caption: string
-  ): Promise<void> {
-    this.bot.telegram.sendPhoto(telegramId, url, { caption });
+  ): Promise<Message.PhotoMessage> {
+    return this.bot.telegram.sendPhoto(telegramId, url, { caption });
   }
 
   public getUserFromCtx(ctx: any): User {

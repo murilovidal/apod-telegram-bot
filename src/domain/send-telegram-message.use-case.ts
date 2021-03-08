@@ -1,3 +1,4 @@
+import { Message } from "telegraf/typings/telegram-types";
 import { Apod } from "../data/entity/apod.entity";
 import { User } from "../data/entity/user.entity";
 import { BotService } from "../service/bot.service";
@@ -13,9 +14,9 @@ export class SendTelegramMessage {
   public async sendTextToUser(
     user: User,
     messageToUser: string
-  ): Promise<void> {
+  ): Promise<Message.TextMessage> {
     try {
-      this.bot.sendText(user.telegramId, messageToUser);
+      return this.bot.sendText(user.telegramId, messageToUser);
     } catch (e) {
       console.log(e);
       throw new Error("SendMessage Failed.");
