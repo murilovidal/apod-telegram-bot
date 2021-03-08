@@ -1,3 +1,4 @@
+import { Message } from "telegraf/typings/telegram-types";
 import { Apod } from "../data/entity/apod.entity";
 import { User } from "../data/entity/user.entity";
 import { BotService } from "../service/bot.service";
@@ -10,7 +11,10 @@ export class SendTelegramMessage {
     this.bot = botService;
   }
 
-  public sendTextToUser(user: User, messageToUser: string): void {
+  public async sendTextToUser(
+    user: User,
+    messageToUser: string
+  ): Promise<void> {
     try {
       this.bot.sendText(user.telegramId, messageToUser);
     } catch (e) {
@@ -22,9 +26,7 @@ export class SendTelegramMessage {
   public async sendMediaToUser(user: User, apod: Apod): Promise<void> {
     try {
       if (apod.mediaType == "image") {
-        await this.bot.sendMedia(user.telegramId, apod.url, {
-          caption: apod.title,
-        });
+        await this.bot.sendMedia(user.telegramId, apod.url, apod.title);
         console.log("PhotoURL sent." + new Date().toLocaleString());
       } else if (apod.mediaType == "video") {
         await this.sendTextToUser(user, apod.url);

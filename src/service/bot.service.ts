@@ -9,16 +9,19 @@ export class BotService {
     this.bot = new Telegraf(envService.BOT_TOKEN);
   }
 
-  public sendText(telegramId: number, messageToUser: string): void {
+  public async sendText(
+    telegramId: number,
+    messageToUser: string
+  ): Promise<void> {
     this.bot.telegram.sendMessage(telegramId, messageToUser);
   }
 
-  public sendMedia(
+  public async sendMedia(
     telegramId: number,
     url: string,
-    caption: { caption: string }
-  ) {
-    this.bot.telegram.sendPhoto(telegramId, url, caption);
+    caption: string
+  ): Promise<void> {
+    this.bot.telegram.sendPhoto(telegramId, url, { caption });
   }
 
   public getUserFromCtx(ctx: any): User {
