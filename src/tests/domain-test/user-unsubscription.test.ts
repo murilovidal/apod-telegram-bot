@@ -1,20 +1,24 @@
 import "mocha";
 import { UserDatasource } from "../../data/datasource/user.datasource";
-import { User } from "../../data/entity/user.entity";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
-import { getConnection } from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
-import * as chaiAsPromised from "chai-as-promised";
+import chaiAsPromised from "chai-as-promised";
+import { BotMessage } from "../../web/bot.message";
+import { Fakes } from "../fixtures/fakes.helper";
 
 describe("Unsubscribe user", () => {
   chai.use(chaiAsPromised);
   let userDatasource: UserDatasource;
   let userSubscriptionUseCase: UserSubscription;
   let userUnsubscriptionUseCase: UserUnsubscription;
+  let fakes: Fakes;
 
-  before(() => {
+  before(async () => {
+    await createConnection();
+    fakes = new Fakes();
     userDatasource = new UserDatasource();
     userUnsubscriptionUseCase = new UserUnsubscription();
     userSubscriptionUseCase = new UserSubscription();
@@ -27,9 +31,7 @@ describe("Unsubscribe user", () => {
   });
 
   it("Should save user as active false when unsubscribing", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123445;
+    const user = fakes.getUser();
     await userSubscriptionUseCase.subscribeUser(user);
 
     await userUnsubscriptionUseCase.unsubscribeUser(user);
@@ -39,19 +41,17 @@ describe("Unsubscribe user", () => {
   });
 
   it("Should return a true when the user is unsubscribed", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123445;
+    const user = fakes.getUser();
 
     await userSubscriptionUseCase.subscribeUser(user);
 
-    expect(await userUnsubscriptionUseCase.unsubscribeUser(user)).to.be.true;
+    expect(userUnsubscriptionUseCase.unsubscribeUser(user)).to.eventually.throw(
+      new Error(BotMessage.UnsubscriptionSuccessful)
+    );
   });
 
   it("Should return error when unsubscribing the user fails", async () => {
-    const user = new User();
-    user.firstName = "Rorschasch";
-    user.telegramId = 123;
+    const user = fakes.getUser();
 
     await userSubscriptionUseCase.subscribeUser(user);
     user.telegramId = 321;

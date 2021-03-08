@@ -4,38 +4,39 @@ import { ApodDatasource } from "../../data/datasource/apod.datasource";
 import { Apod } from "../../data/entity/apod.entity";
 import { expect } from "chai";
 import * as chai from "chai";
-import * as chaiAsPromised from "chai-as-promised";
-
-function fakeApod() {
-  let fakeApod = new Apod();
-
-  fakeApod.url = "www.apod.com";
-  fakeApod.title = "Death Star";
-  fakeApod.explanation = "That's no moon";
-  fakeApod.mediaType = "image";
-
-  return fakeApod;
-}
+import chaiAsPromised from "chai-as-promised";
+import sinon from "sinon";
+import axios from "axios";
+import ApodFixture from "../fixtures/apod.fixture.json";
+import { Fakes } from "../fixtures/fakes.helper";
 
 describe("Apod datasource ", async () => {
   chai.use(chaiAsPromised);
   let apodDatasource: ApodDatasource;
+  let fakes: Fakes;
 
   before(async () => {
+    fakes = new Fakes();
     const connection = await createConnection();
     await connection.dropDatabase();
     await connection.synchronize();
     apodDatasource = new ApodDatasource();
   });
 
+  after(() => {
+    const connection = getConnection();
+    connection.close();
+  });
+
   beforeEach(async () => {
+    sinon.restore();
     const connection = getConnection();
     await connection.dropDatabase();
     await connection.synchronize();
   });
 
   it("Should not save apod without url", async () => {
-    const apod = fakeApod();
+    const apod = fakes.getApod();
     apod.url = new Apod().url;
 
     expect(apodDatasource.setApod(apod)).to.eventually.throw(
@@ -44,7 +45,7 @@ describe("Apod datasource ", async () => {
   });
 
   it("Should not save apod without title", async () => {
-    const apod = fakeApod();
+    const apod = fakes.getApod();
     apod.title = new Apod().title;
 
     expect(apodDatasource.setApod(apod)).to.eventually.throw(
@@ -53,7 +54,7 @@ describe("Apod datasource ", async () => {
   });
 
   it("Should not save apod without explanation", async () => {
-    const apod = fakeApod();
+    const apod = fakes.getApod();
     apod.explanation = new Apod().explanation;
 
     expect(apodDatasource.setApod(apod)).to.eventually.throw(
@@ -64,7 +65,8 @@ describe("Apod datasource ", async () => {
   });
 
   it("Should not save apod without media type", async () => {
-    const apod = fakeApod();
+    const apod = fakes.getApod();
+
     apod.mediaType = new Apod().mediaType;
 
     expect(apodDatasource.setApod(apod)).to.eventually.throw(
@@ -75,14 +77,18 @@ describe("Apod datasource ", async () => {
   });
 
   it("Should return the latest instance of apod", async () => {
-    const apod = fakeApod();
-    await apodDatasource.setApod(apod);
+    sinon.stub(axios, "get").callsFake(async () => ApodFixture);
 
-    expect(await apodDatasource.getApod()).to.be.instanceOf(Apod);
+    const apod = await apodDatasource.getApod();
+
+    expect(apod.url).to.be.eq(ApodFixture.data.url);
+    expect(apod.title).to.be.eq(ApodFixture.data.title);
+    expect(apod.mediaType).to.be.eq(ApodFixture.data.media_type);
+    expect(apod.explanation).to.be.eq(ApodFixture.data.explanation);
   });
 
   it("Should save apod successfuly", async () => {
-    const apod = fakeApod();
+    const apod = fakes.getApod();
     await apodDatasource.setApod(apod);
 
     const saved = await apodDatasource.getApod();
@@ -93,23 +99,14 @@ describe("Apod datasource ", async () => {
     expect(saved!.mediaType).to.be.eq(apod.mediaType);
   });
 
-  it("Should get a random apod with title", async () => {
-    let apod = await apodDatasource.getRandomApod();
-    expect(apod.title).to.exist;
-  });
+  it("Should get a complete random apod", async () => {
+    sinon.stub(axios, "get").callsFake(async () => ApodFixture);
 
-  it("Should get a random apod with url", async () => {
-    let apod = await apodDatasource.getRandomApod();
-    expect(apod.url).to.exist;
-  });
+    const apod = await apodDatasource.getRandomApod();
 
-  it("Should get a random apod with explanation", async () => {
-    let apod = await apodDatasource.getRandomApod();
-    expect(apod.explanation).to.exist;
-  });
-
-  it("Should get a random apod with media type", async () => {
-    let apod = await apodDatasource.getRandomApod();
-    expect(apod.mediaType).to.exist;
+    expect(apod.url).to.be.eq(ApodFixture.data.url);
+    expect(apod.title).to.be.eq(ApodFixture.data.title);
+    expect(apod.mediaType).to.be.eq(ApodFixture.data.media_type);
+    expect(apod.explanation).to.be.eq(ApodFixture.data.explanation);
   });
 });
