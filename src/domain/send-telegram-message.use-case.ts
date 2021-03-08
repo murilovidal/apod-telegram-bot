@@ -1,4 +1,3 @@
-import { Message } from "telegraf/typings/telegram-types";
 import { Apod } from "../data/entity/apod.entity";
 import { User } from "../data/entity/user.entity";
 import { BotService } from "../service/bot.service";
