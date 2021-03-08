@@ -25,7 +25,7 @@ typeorm: "0.2.30"
 Clone the repository with command `git clone https://github.com/murilovidal/apod-telegram-bot`
 Fill the `.env` with your environment. Refer to `.sample.env` as an example.
 
-run `npm install`
+run `npm install` && `npm start`
 
 ## Built With
 
