@@ -6,15 +6,18 @@ import chaiAsPromised from "chai-as-promised";
 import { SendTelegramMessage } from "../../domain/send-telegram-message.use-case";
 import { Fakes } from "../fixtures/fakes.helper";
 import { BotService } from "../../service/bot.service";
+import { EnvService } from "../../service/env-service";
 
 describe("SendTelegramMessage Use case", () => {
   chai.use(chaiAsPromised);
   let sendTelegramMessage: SendTelegramMessage;
   let fakes: Fakes;
+  let envService: EnvService;
 
   before(() => {
     fakes = new Fakes();
-    sendTelegramMessage = new SendTelegramMessage();
+    envService = new EnvService();
+    sendTelegramMessage = new SendTelegramMessage(new BotService(envService));
   });
 
   beforeEach(async () => {
@@ -22,7 +25,7 @@ describe("SendTelegramMessage Use case", () => {
   });
 
   it("Should send text message to user", async () => {
-    const user = fakes.user;
+    const user = fakes.getUser();
     const spy = sinon.spy(BotService.prototype, "sendText");
 
     sendTelegramMessage.sendTextToUser(user, "message");
@@ -31,9 +34,9 @@ describe("SendTelegramMessage Use case", () => {
   });
 
   it("Should send media message to user", async () => {
-    const user = fakes.user;
+    const user = fakes.getUser();
     const spy = sinon.spy(BotService.prototype, "sendMedia");
-    const apod = fakes.apod;
+    const apod = fakes.getApod();
 
     sendTelegramMessage.sendMediaToUser(user, apod);
 

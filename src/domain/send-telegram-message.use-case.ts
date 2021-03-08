@@ -6,8 +6,8 @@ import { BotMessage } from "../web/bot.message";
 export class SendTelegramMessage {
   private bot: BotService;
 
-  constructor() {
-    this.bot = new BotService();
+  constructor(botService: BotService) {
+    this.bot = botService;
   }
 
   public sendTextToUser(user: User, messageToUser: string): void {
@@ -22,19 +22,14 @@ export class SendTelegramMessage {
   public async sendMediaToUser(user: User, apod: Apod): Promise<void> {
     try {
       if (apod.mediaType == "image") {
-        await this.bot.sendMedia(
-          user.telegramId,
-          { url: apod.url },
-          { caption: apod.title }
-        );
+        await this.bot.sendMedia(user.telegramId, apod.url, {
+          caption: apod.title,
+        });
         console.log("PhotoURL sent." + new Date().toLocaleString());
       } else if (apod.mediaType == "video") {
-        try {
-          await this.sendTextToUser(user, apod.url);
-          console.log("VideoURL sent." + new Date().toLocaleString());
-        } catch (e) {
-          this.sendTextToUser(user, BotMessage.FailedToSendApod);
-        }
+        await this.sendTextToUser(user, apod.url);
+        console.log("VideoURL sent." + new Date().toLocaleString());
+        this.sendTextToUser(user, BotMessage.FailedToSendApod);
       }
       await this.sendTextToUser(user, apod.explanation);
     } catch (e) {

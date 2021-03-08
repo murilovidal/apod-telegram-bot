@@ -1,5 +1,5 @@
 import "mocha";
-import { getConnection } from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
@@ -15,11 +15,17 @@ describe("Subscribe user", () => {
   let userUnsubscriptionUseCase: UserUnsubscription;
   let fakes: Fakes;
 
-  before(() => {
+  before(async () => {
+    await createConnection();
     fakes = new Fakes();
     userDatasource = new UserDatasource();
     userSubscriptionUseCase = new UserSubscription();
     userUnsubscriptionUseCase = new UserUnsubscription();
+  });
+
+  after(() => {
+    const connection = getConnection();
+    connection.close();
   });
 
   beforeEach(async () => {
@@ -29,7 +35,7 @@ describe("Subscribe user", () => {
   });
 
   it("Should save user when it subscribes first time", async () => {
-    const user = fakes.user;
+    const user = fakes.getUser();
 
     await userSubscriptionUseCase.subscribeUser(user);
     const saved = await userDatasource.findUserById(user.telegramId);
@@ -39,7 +45,7 @@ describe("Subscribe user", () => {
   });
 
   it("Should save user as active true when subscribing", async () => {
-    const user = fakes.user;
+    const user = fakes.getUser();
 
     await userSubscriptionUseCase.subscribeUser(user);
     const saved = await userDatasource.findUserById(user.telegramId);
@@ -48,7 +54,7 @@ describe("Subscribe user", () => {
   });
 
   it("Should return 'User already subscribed when user is already saved and active", async () => {
-    const user = fakes.user;
+    const user = fakes.getUser();
 
     await userSubscriptionUseCase.subscribeUser(user);
 

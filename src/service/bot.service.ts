@@ -4,23 +4,21 @@ import { EnvService } from "./env-service";
 
 export class BotService {
   private bot: Telegraf;
-  private envService: EnvService;
 
-  constructor() {
-    this.envService = new EnvService();
-    this.bot = new Telegraf(this.envService.BOT_TOKEN);
+  constructor(envService: EnvService) {
+    this.bot = new Telegraf(envService.BOT_TOKEN);
   }
 
-  public async sendText(telegramId: number, messageToUser: string) {
-    await this.bot.telegram.sendMessage(telegramId, messageToUser);
+  public sendText(telegramId: number, messageToUser: string): void {
+    this.bot.telegram.sendMessage(telegramId, messageToUser);
   }
 
-  public async sendMedia(
+  public sendMedia(
     telegramId: number,
-    url: { url: string },
+    url: string,
     caption: { caption: string }
   ) {
-    await this.bot.telegram.sendPhoto(telegramId, url, caption);
+    this.bot.telegram.sendPhoto(telegramId, url, caption);
   }
 
   public getUserFromCtx(ctx: any): User {

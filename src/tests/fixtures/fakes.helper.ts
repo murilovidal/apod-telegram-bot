@@ -2,18 +2,22 @@ import { Apod } from "../../data/entity/apod.entity";
 import { User } from "../../data/entity/user.entity";
 
 export class Fakes {
-  public user: User;
-  public apod: Apod;
+  constructor() {}
 
-  constructor() {
-    this.user = new User();
-    this.apod = new Apod();
-    this.user.firstName = "Rorschach";
-    this.user.telegramId = 1984;
+  public getUser(): User {
+    const fakeUser = new User();
+    fakeUser.firstName = "Rorschach";
+    fakeUser.telegramId = 1984;
+    return fakeUser;
+  }
+  public getApod(): Apod {
+    const fakeApod = new Apod();
 
-    this.apod.explanation = "Explanation";
-    this.apod.mediaType = "image";
-    this.apod.title = "Nice Title";
-    this.apod.url = "www.url.com";
+    fakeApod.url = "www.apod.com";
+    fakeApod.title = "Death Star";
+    fakeApod.explanation = "That's no moon";
+    fakeApod.mediaType = "image";
+
+    return fakeApod;
   }
 }

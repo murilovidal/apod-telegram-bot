@@ -1,9 +1,9 @@
 require("dotenv").config();
 
 export class EnvService {
-  APOD_URL: string;
-  URL_RANDOM: string;
-  BOT_TOKEN: string;
+  public APOD_URL: string;
+  public URL_RANDOM: string;
+  public BOT_TOKEN: string;
 
   constructor() {
     this.APOD_URL = <string>process.env.BASE_URL + <string>process.env.API_KEY;

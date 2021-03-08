@@ -2,7 +2,7 @@ import "mocha";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
-import { getConnection } from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -16,7 +16,8 @@ describe("Unsubscribe user", () => {
   let userUnsubscriptionUseCase: UserUnsubscription;
   let fakes: Fakes;
 
-  before(() => {
+  before(async () => {
+    await createConnection();
     fakes = new Fakes();
     userDatasource = new UserDatasource();
     userUnsubscriptionUseCase = new UserUnsubscription();
@@ -30,7 +31,7 @@ describe("Unsubscribe user", () => {
   });
 
   it("Should save user as active false when unsubscribing", async () => {
-    const user = fakes.user;
+    const user = fakes.getUser();
     await userSubscriptionUseCase.subscribeUser(user);
 
     await userUnsubscriptionUseCase.unsubscribeUser(user);
@@ -40,7 +41,7 @@ describe("Unsubscribe user", () => {
   });
 
   it("Should return a true when the user is unsubscribed", async () => {
-    const user = fakes.user;
+    const user = fakes.getUser();
 
     await userSubscriptionUseCase.subscribeUser(user);
 
@@ -50,7 +51,7 @@ describe("Unsubscribe user", () => {
   });
 
   it("Should return error when unsubscribing the user fails", async () => {
-    const user = fakes.user;
+    const user = fakes.getUser();
 
     await userSubscriptionUseCase.subscribeUser(user);
     user.telegramId = 321;
