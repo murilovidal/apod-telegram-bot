@@ -1,0 +1,13 @@
+services:
+  apod-bot:
+    build: .
+  postgres:
+    env_file:
+      - ./database/database.env
+    build: "./database"
+
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+
+volumes:
+  database-data:

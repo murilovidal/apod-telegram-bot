@@ -12,4 +12,5 @@ const telegramPresentation = new TelegramPresentation(
   const connection = await createConnection();
   await connection.synchronize();
   telegramPresentation.startBot();
+  console.log("Bot started");
 })();
