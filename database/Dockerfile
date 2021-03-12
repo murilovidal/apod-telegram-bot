@@ -10,8 +10,10 @@ RUN apt-get update && apt-get install -y postgresql
 
 USER postgres
 
+ARG POSTGRES_USER
+ARG POSTGRES_PASSWORD
 RUN    /etc/init.d/postgresql start &&\
-    psql --command "CREATE USER apod WITH SUPERUSER PASSWORD 'apod';" &&\
+    psql --command "CREATE USER ${POSTGRES_USER} WITH SUPERUSER PASSWORD '${POSTGRES_PASSWORD}';" &&\
     createdb -O apod apod
 
 RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/13/main/pg_hba.conf

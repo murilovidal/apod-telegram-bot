@@ -7,7 +7,7 @@
     "test": "mocha --exit  -r ts-node/register 'src/tests/**/*.ts'",
     "start:dev": "ts-node src/index.ts",
     "build": "tsc --build && cp .env ./dist/",
-    "start": "npm run build && cd dist && node index",
+    "start": "npm run build &&  node dist/index",
     "typeorm": "ts-node './node_modules/typeorm/cli.js'"
   },
   "repository": {

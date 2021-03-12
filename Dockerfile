@@ -7,5 +7,3 @@ WORKDIR /apod-telegram-bot
 RUN npm install
 
 CMD ["npm","start"]
-
-EXPOSE 80
