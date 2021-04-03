@@ -1,5 +1,5 @@
 import "mocha";
-import { Db, getConnection } from "typeorm";
+import { getConnection } from "typeorm";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";

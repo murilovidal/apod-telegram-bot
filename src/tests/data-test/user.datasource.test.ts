@@ -1,7 +1,7 @@
 import "mocha";
 import { User } from "../../data/entity/user.entity";
 import { UserDatasource } from "../../data/datasource/user.datasource";
-import { createConnection, getConnection, getConnectionOptions } from "typeorm";
+import { getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";

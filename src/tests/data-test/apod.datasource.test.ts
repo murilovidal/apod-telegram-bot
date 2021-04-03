@@ -1,5 +1,5 @@
 import "mocha";
-import { createConnection, getConnection } from "typeorm";
+import { getConnection } from "typeorm";
 import { ApodDatasource } from "../../data/datasource/apod.datasource";
 import { Apod } from "../../data/entity/apod.entity";
 import { expect } from "chai";
