@@ -5,3 +5,4 @@ database/database.env
 dist
 database-data
 database-data-test
+ormconfig.json

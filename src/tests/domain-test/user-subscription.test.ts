@@ -1,5 +1,5 @@
 import "mocha";
-import { createConnection, getConnection, getConnectionOptions } from "typeorm";
+import { Db, getConnection } from "typeorm";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
@@ -7,25 +7,18 @@ import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { Fakes } from "../fixtures/fakes.helper";
+import { DbConnectionHelper } from "../db-connection-helper";
 
 describe("Subscribe user", () => {
   chai.use(chaiAsPromised);
+  const dbConnectionHelper = new DbConnectionHelper();
   let userDatasource: UserDatasource;
   let userSubscriptionUseCase: UserSubscription;
   let userUnsubscriptionUseCase: UserUnsubscription;
   let fakes: Fakes;
 
   before(async () => {
-    const connection = await createConnection({
-      name: "default",
-      type: "postgres",
-      host: "localhost",
-      port: 33300,
-      username: "apod_test",
-      password: "apod_test",
-      database: "apod_test",
-      entities: ["src/data/entity/*.entity.ts"],
-    });
+    const connection = await dbConnectionHelper.makeConnection();
 
     fakes = new Fakes();
     userDatasource = new UserDatasource();
@@ -33,9 +26,9 @@ describe("Subscribe user", () => {
     userUnsubscriptionUseCase = new UserUnsubscription();
   });
 
-  after(() => {
+  after(async () => {
     const connection = getConnection();
-    connection.close();
+    await connection.close();
   });
 
   beforeEach(async () => {

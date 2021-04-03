@@ -6,23 +6,16 @@ import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { Fakes } from "../fixtures/fakes.helper";
+import { DbConnectionHelper } from "../db-connection-helper";
 
 describe("User datasource", () => {
   chai.use(chaiAsPromised);
   let userDatasource: UserDatasource;
   let fakes: Fakes;
+  const dbConnectionHelper = new DbConnectionHelper();
 
   before(async () => {
-    const connection = await createConnection({
-      name: "default",
-      type: "postgres",
-      host: "localhost",
-      port: 33300,
-      username: "apod_test",
-      password: "apod_test",
-      database: "apod_test",
-      entities: ["src/data/entity/*.entity.ts"],
-    });
+    const connection = await dbConnectionHelper.makeConnection();
 
     await connection.dropDatabase();
     await connection.synchronize();

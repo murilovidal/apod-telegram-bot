@@ -9,34 +9,27 @@ import sinon from "sinon";
 import axios from "axios";
 import ApodFixture from "../fixtures/apod.fixture.json";
 import { Fakes } from "../fixtures/fakes.helper";
+import { DbConnectionHelper } from "../db-connection-helper";
 
 describe("Apod datasource ", async () => {
   chai.use(chaiAsPromised);
   let apodDatasource: ApodDatasource;
   let fakes: Fakes;
+  const dbConnectionHelper = new DbConnectionHelper();
 
   before(async () => {
     fakes = new Fakes();
 
-    const connection = await createConnection({
-      name: "default",
-      type: "postgres",
-      host: "localhost",
-      port: 33300,
-      username: "apod_test",
-      password: "apod_test",
-      database: "apod_test",
-      entities: ["src/data/entity/*.entity.ts"],
-    });
+    const connection = await dbConnectionHelper.makeConnection();
 
     await connection.dropDatabase();
     await connection.synchronize();
     apodDatasource = new ApodDatasource();
   });
 
-  after(() => {
+  after(async () => {
     const connection = getConnection("default");
-    connection.close();
+    await connection.close();
   });
 
   beforeEach(async () => {

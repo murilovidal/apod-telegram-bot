@@ -11,8 +11,6 @@ const telegramPresentation = new TelegramPresentation(
 );
 
 (async () => {
-  console.log("Creating database Connection...");
-
   const connection = await createConnection();
 
   await connection.synchronize();

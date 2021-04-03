@@ -2,31 +2,24 @@ import "mocha";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
-import { createConnection, getConnection } from "typeorm";
+import { getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { BotMessage } from "../../web/bot.message";
 import { Fakes } from "../fixtures/fakes.helper";
+import { DbConnectionHelper } from "../db-connection-helper";
 
 describe("Unsubscribe user", () => {
   chai.use(chaiAsPromised);
+  const dbConnectionHelper = new DbConnectionHelper();
   let userDatasource: UserDatasource;
   let userSubscriptionUseCase: UserSubscription;
   let userUnsubscriptionUseCase: UserUnsubscription;
   let fakes: Fakes;
 
   before(async () => {
-    const connection = await createConnection({
-      name: "default",
-      type: "postgres",
-      host: "localhost",
-      port: 33300,
-      username: "apod_test",
-      password: "apod_test",
-      database: "apod_test",
-      entities: ["src/data/entity/*.entity.ts"],
-    });
+    await dbConnectionHelper.makeConnection();
 
     fakes = new Fakes();
     userDatasource = new UserDatasource();
@@ -40,9 +33,9 @@ describe("Unsubscribe user", () => {
     await connection.synchronize();
   });
 
-  after(() => {
+  after(async () => {
     const connection = getConnection();
-    connection.close();
+    await connection.close();
   });
 
   it("Should save user as active false when unsubscribing", async () => {
