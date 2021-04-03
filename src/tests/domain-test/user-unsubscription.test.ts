@@ -17,7 +17,17 @@ describe("Unsubscribe user", () => {
   let fakes: Fakes;
 
   before(async () => {
-    await createConnection();
+    const connection = await createConnection({
+      name: "default",
+      type: "postgres",
+      host: "localhost",
+      port: 33300,
+      username: "apod_test",
+      password: "apod_test",
+      database: "apod_test",
+      entities: ["src/data/entity/*.entity.ts"],
+    });
+
     fakes = new Fakes();
     userDatasource = new UserDatasource();
     userUnsubscriptionUseCase = new UserUnsubscription();
@@ -28,6 +38,11 @@ describe("Unsubscribe user", () => {
     const connection = getConnection();
     await connection.dropDatabase();
     await connection.synchronize();
+  });
+
+  after(() => {
+    const connection = getConnection();
+    connection.close();
   });
 
   it("Should save user as active false when unsubscribing", async () => {

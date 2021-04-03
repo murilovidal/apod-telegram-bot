@@ -1,4 +1,4 @@
-require("dotenv").config();
+import * as dotenv from "dotenv";
 
 export class EnvService {
   public APOD_URL: string;

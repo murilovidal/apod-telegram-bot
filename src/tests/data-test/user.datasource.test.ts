@@ -1,7 +1,7 @@
 import "mocha";
 import { User } from "../../data/entity/user.entity";
 import { UserDatasource } from "../../data/datasource/user.datasource";
-import { createConnection, getConnection } from "typeorm";
+import { createConnection, getConnection, getConnectionOptions } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -13,7 +13,17 @@ describe("User datasource", () => {
   let fakes: Fakes;
 
   before(async () => {
-    const connection = await createConnection();
+    const connection = await createConnection({
+      name: "default",
+      type: "postgres",
+      host: "localhost",
+      port: 33300,
+      username: "apod_test",
+      password: "apod_test",
+      database: "apod_test",
+      entities: ["src/data/entity/*.entity.ts"],
+    });
+
     await connection.dropDatabase();
     await connection.synchronize();
     userDatasource = new UserDatasource();

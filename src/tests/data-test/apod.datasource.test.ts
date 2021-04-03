@@ -17,20 +17,31 @@ describe("Apod datasource ", async () => {
 
   before(async () => {
     fakes = new Fakes();
-    const connection = await createConnection();
+
+    const connection = await createConnection({
+      name: "default",
+      type: "postgres",
+      host: "localhost",
+      port: 33300,
+      username: "apod_test",
+      password: "apod_test",
+      database: "apod_test",
+      entities: ["src/data/entity/*.entity.ts"],
+    });
+
     await connection.dropDatabase();
     await connection.synchronize();
     apodDatasource = new ApodDatasource();
   });
 
   after(() => {
-    const connection = getConnection();
+    const connection = getConnection("default");
     connection.close();
   });
 
   beforeEach(async () => {
     sinon.restore();
-    const connection = getConnection();
+    const connection = getConnection("default");
     await connection.dropDatabase();
     await connection.synchronize();
   });

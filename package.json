@@ -2,7 +2,7 @@
   "name": "apod-telegram-bot",
   "version": "1.0.0",
   "description": "telegram bot for nasa's apod",
-  "main": "app.ts",
+  "main": "index.ts",
   "scripts": {
     "test": "mocha --exit  -r ts-node/register 'src/tests/**/*.ts'",
     "start:dev": "ts-node src/index.ts",

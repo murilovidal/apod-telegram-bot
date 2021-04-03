@@ -1,5 +1,5 @@
 import "mocha";
-import { createConnection, getConnection } from "typeorm";
+import { createConnection, getConnection, getConnectionOptions } from "typeorm";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
@@ -16,7 +16,17 @@ describe("Subscribe user", () => {
   let fakes: Fakes;
 
   before(async () => {
-    await createConnection();
+    const connection = await createConnection({
+      name: "default",
+      type: "postgres",
+      host: "localhost",
+      port: 33300,
+      username: "apod_test",
+      password: "apod_test",
+      database: "apod_test",
+      entities: ["src/data/entity/*.entity.ts"],
+    });
+
     fakes = new Fakes();
     userDatasource = new UserDatasource();
     userSubscriptionUseCase = new UserSubscription();
@@ -38,6 +48,7 @@ describe("Subscribe user", () => {
     const user = fakes.getUser();
 
     await userSubscriptionUseCase.subscribeUser(user);
+
     const saved = await userDatasource.findUserById(user.telegramId);
 
     expect(saved.telegramId).to.be.eq(user.telegramId);

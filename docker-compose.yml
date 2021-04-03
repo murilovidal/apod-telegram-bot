@@ -11,6 +11,8 @@ services:
     env_file:
       - .env
     image: postgres:13
+    environment:
+      PGDATA: /var/lib/postgresql/data/apod_bot/
     container_name: database_postgres_apod
     volumes:
-      - ./database-data:/var/lib/postgresql/data/
+      - ./database-data:/var/lib/postgresql/data/apod_bot/
