@@ -19,7 +19,7 @@
     "apod"
   ],
   "author": "Murilo Vidal",
-  "license": "GPL-3.0-or-later",
+  "license": "GNU GPL V3.0",
   "bugs": {
     "url": "https://github.com/murilovidal/apod-telegram-bot/issues"
   },
