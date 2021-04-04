@@ -2,13 +2,13 @@ import "mocha";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
-import { getConnection } from "typeorm";
+import { Connection, getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { BotMessage } from "../../web/bot.message";
 import { Fakes } from "../fixtures/fakes.helper";
-import { DbConnectionHelper } from "../db-connection-helper";
+import { DbConnectionHelper } from "../../helper/db-connection-helper";
 
 describe("Unsubscribe user", () => {
   chai.use(chaiAsPromised);
@@ -19,9 +19,14 @@ describe("Unsubscribe user", () => {
   let fakes: Fakes;
 
   before(async () => {
-    await dbConnectionHelper.makeConnection();
-
     fakes = new Fakes();
+    let connection: Connection;
+    try {
+      connection = getConnection();
+    } catch (error) {
+      connection = await dbConnectionHelper.makeConnection();
+    }
+
     userDatasource = new UserDatasource();
     userUnsubscriptionUseCase = new UserUnsubscription();
     userSubscriptionUseCase = new UserSubscription();
@@ -29,13 +34,7 @@ describe("Unsubscribe user", () => {
 
   beforeEach(async () => {
     const connection = getConnection();
-    await connection.dropDatabase();
-    await connection.synchronize();
-  });
-
-  after(async () => {
-    const connection = getConnection();
-    await connection.close();
+    await dbConnectionHelper.clear(connection);
   });
 
   it("Should save user as active false when unsubscribing", async () => {

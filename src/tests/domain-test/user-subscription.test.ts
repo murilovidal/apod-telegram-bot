@@ -1,5 +1,5 @@
 import "mocha";
-import { getConnection } from "typeorm";
+import { Connection, getConnection } from "typeorm";
 import { UserDatasource } from "../../data/datasource/user.datasource";
 import { UserSubscription } from "../../domain/user-subscription.use-case";
 import { UserUnsubscription } from "../../domain/user-unsubscription.use-case";
@@ -7,7 +7,7 @@ import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { Fakes } from "../fixtures/fakes.helper";
-import { DbConnectionHelper } from "../db-connection-helper";
+import { DbConnectionHelper } from "../../helper/db-connection-helper";
 
 describe("Subscribe user", () => {
   chai.use(chaiAsPromised);
@@ -18,7 +18,12 @@ describe("Subscribe user", () => {
   let fakes: Fakes;
 
   before(async () => {
-    const connection = await dbConnectionHelper.makeConnection();
+    let connection: Connection;
+    try {
+      connection = getConnection();
+    } catch (error) {
+      connection = await dbConnectionHelper.makeConnection();
+    }
 
     fakes = new Fakes();
     userDatasource = new UserDatasource();
@@ -26,15 +31,9 @@ describe("Subscribe user", () => {
     userUnsubscriptionUseCase = new UserUnsubscription();
   });
 
-  after(async () => {
-    const connection = getConnection();
-    await connection.close();
-  });
-
   beforeEach(async () => {
     const connection = getConnection();
-    await connection.dropDatabase();
-    await connection.synchronize();
+    await dbConnectionHelper.clear(connection);
   });
 
   it("Should save user when it subscribes first time", async () => {

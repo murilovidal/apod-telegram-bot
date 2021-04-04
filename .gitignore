@@ -1,8 +1,6 @@
 .env
-.env.test
 node_modules/
 database/database.env
 dist
 database-data
 database-data-test
-ormconfig.json

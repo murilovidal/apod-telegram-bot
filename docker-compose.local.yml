@@ -10,4 +10,4 @@ services:
       PGDATA: /var/lib/postgresql/data/apod_bot_test/
     container_name: database_postgres_apod_test
     volumes:
-      - ./database-data-test:/var/lib/postgresql/data/apod_test
+      - ./database-data-test:/var/lib/postgresql/data/apod_bot_test

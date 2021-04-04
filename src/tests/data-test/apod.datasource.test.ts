@@ -1,5 +1,5 @@
 import "mocha";
-import { getConnection } from "typeorm";
+import { Connection, getConnection } from "typeorm";
 import { ApodDatasource } from "../../data/datasource/apod.datasource";
 import { Apod } from "../../data/entity/apod.entity";
 import { expect } from "chai";
@@ -9,7 +9,7 @@ import sinon from "sinon";
 import axios from "axios";
 import ApodFixture from "../fixtures/apod.fixture.json";
 import { Fakes } from "../fixtures/fakes.helper";
-import { DbConnectionHelper } from "../db-connection-helper";
+import { DbConnectionHelper } from "../../helper/db-connection-helper";
 
 describe("Apod datasource ", async () => {
   chai.use(chaiAsPromised);
@@ -19,24 +19,19 @@ describe("Apod datasource ", async () => {
 
   before(async () => {
     fakes = new Fakes();
-
-    const connection = await dbConnectionHelper.makeConnection();
-
-    await connection.dropDatabase();
-    await connection.synchronize();
+    let connection: Connection;
+    try {
+      connection = getConnection();
+    } catch (error) {
+      connection = await dbConnectionHelper.makeConnection();
+    }
     apodDatasource = new ApodDatasource();
-  });
-
-  after(async () => {
-    const connection = getConnection("default");
-    await connection.close();
   });
 
   beforeEach(async () => {
     sinon.restore();
-    const connection = getConnection("default");
-    await connection.dropDatabase();
-    await connection.synchronize();
+    const connection = getConnection();
+    await dbConnectionHelper.clear(connection);
   });
 
   it("Should not save apod without url", async () => {
