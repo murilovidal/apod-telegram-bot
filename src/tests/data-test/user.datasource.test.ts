@@ -1,34 +1,33 @@
 import "mocha";
 import { User } from "../../data/entity/user.entity";
 import { UserDatasource } from "../../data/datasource/user.datasource";
-import { createConnection, getConnection } from "typeorm";
+import { Connection, getConnection } from "typeorm";
 import { expect } from "chai";
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { Fakes } from "../fixtures/fakes.helper";
+import { DbConnectionHelper } from "../../helper/db-connection-helper";
 
 describe("User datasource", () => {
   chai.use(chaiAsPromised);
   let userDatasource: UserDatasource;
   let fakes: Fakes;
+  const dbConnectionHelper = new DbConnectionHelper();
 
   before(async () => {
-    const connection = await createConnection();
-    await connection.dropDatabase();
-    await connection.synchronize();
-    userDatasource = new UserDatasource();
     fakes = new Fakes();
-  });
-
-  after(() => {
-    const connection = getConnection();
-    connection.close();
+    let connection: Connection;
+    try {
+      connection = getConnection();
+    } catch (error) {
+      connection = await dbConnectionHelper.makeConnection();
+    }
+    userDatasource = new UserDatasource();
   });
 
   beforeEach(async () => {
     const connection = getConnection();
-    await connection.dropDatabase();
-    await connection.synchronize();
+    await dbConnectionHelper.clear(connection);
   });
 
   it("Should not save user without firstname", () => {

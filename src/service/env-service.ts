@@ -1,4 +1,4 @@
-require("dotenv").config();
+import * as dotenv from "dotenv";
 
 export class EnvService {
   public APOD_URL: string;
@@ -6,6 +6,7 @@ export class EnvService {
   public BOT_TOKEN: string;
 
   constructor() {
+    dotenv.config();
     this.APOD_URL = <string>process.env.BASE_URL + <string>process.env.API_KEY;
     this.URL_RANDOM =
       <string>process.env.BASE_URL + <string>process.env.API_KEY + "&count=1";

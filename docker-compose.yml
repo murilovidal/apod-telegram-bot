@@ -1,0 +1,18 @@
+version: "3"
+services:
+  apod-bot:
+    build: .
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    container_name: app_apod_bot
+  postgres:
+    env_file:
+      - .env
+    image: postgres:13
+    environment:
+      PGDATA: /var/lib/postgresql/data/apod_bot/
+    container_name: database_postgres_apod
+    volumes:
+      - ./database-data:/var/lib/postgresql/data/apod_bot/
