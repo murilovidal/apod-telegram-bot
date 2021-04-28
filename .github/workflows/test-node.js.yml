@@ -20,6 +20,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: docker-compose -f docker-compose.local.yml up
+      - run: docker-compose -f docker-compose.local.yml up -d
       - run: npm ci
       - run: npm test
