@@ -4,3 +4,4 @@ database/database.env
 dist
 database-data
 database-data-test
+.env.test
