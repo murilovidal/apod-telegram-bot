@@ -12,8 +12,6 @@ const telegramPresentation = new TelegramPresentation(
 const dbConnectionHelper = new DbConnectionHelper();
 
 (async () => {
-  console.log(process.env);
-
   await dbConnectionHelper.makeConnection();
   const connection = getConnection();
   await connection.synchronize();
