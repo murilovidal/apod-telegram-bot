@@ -21,7 +21,11 @@ export class GetApodCronjob {
     }
   }
   private async getNewApod() {
-    const apod = await this.apodDatasource.getApodFromAPI();
-    this.apodDatasource.setApod(apod);
+    try {
+      const apod = await this.apodDatasource.getApodFromAPI();
+      this.apodDatasource.setApod(apod);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
