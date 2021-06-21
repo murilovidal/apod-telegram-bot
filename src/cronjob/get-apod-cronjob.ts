@@ -1,5 +1,6 @@
 import { CronJob } from "cron";
 import { ApodDatasource } from "../data/datasource/apod.datasource";
+import { Apod } from "../data/entity/apod.entity";
 
 export class GetApodCronjob {
   private cronJob: CronJob;
@@ -26,6 +27,7 @@ export class GetApodCronjob {
       this.apodDatasource.setApod(apod);
     } catch (error) {
       console.log(error);
+      return this.apodDatasource.getApod();
     }
   }
 }
