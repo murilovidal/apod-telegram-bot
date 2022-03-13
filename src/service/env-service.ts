@@ -7,7 +7,7 @@ export class EnvService {
 
   constructor() {
     if (process.env.npm_lifecycle_event == "start:dev") {
-      dotenv.config({ path: "./.env.test" });
+      dotenv.config({ path: "./.env.dev" });
     } else {
       dotenv.config();
     }
