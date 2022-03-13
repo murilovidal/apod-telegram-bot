@@ -1,6 +1,7 @@
 import { getConnection, getRepository } from "typeorm";
 import { Apod } from "../entity/apod.entity";
 import { EnvService } from "../../service/env-service";
+import { resolve } from "url";
 const axios = require("axios");
 
 export class ApodDatasource {
@@ -16,15 +17,23 @@ export class ApodDatasource {
 
   public async setApod(apod: Apod): Promise<Apod> {
     const repository = getRepository(Apod);
-
-    return repository.save(apod);
+    try {
+      await repository.save(apod);
+      return apod;
+    } catch (error) {
+      return apod;
+    }
   }
 
   public async getApod(): Promise<Apod> {
     const connection = getConnection();
     const repository = connection.getRepository(Apod);
     try {
-      const apod = await repository.findOne();
+      const apod = await repository
+        .createQueryBuilder("apod")
+        .orderBy("created_at", "DESC")
+        .getOne();
+
       if (apod) {
         return apod;
       } else {

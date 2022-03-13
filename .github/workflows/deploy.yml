@@ -1,0 +1,22 @@
+name: Deploy
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: copy file via ssh key
+    uses: ./
+    with:
+      host: ${{ secrets.HOST }}
+      username: ${{ secrets.USERNAME }}
+      key: ${{ secrets.SSHKEY }}
+      port: ${{ secrets.PORT }}
+      source: "tests/a.txt,tests/b.txt"
+      target: "test"

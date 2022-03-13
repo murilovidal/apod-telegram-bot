@@ -3,7 +3,6 @@ import {
   EventSubscriber,
   InsertEvent,
 } from "typeorm";
-import { ApodDatasource } from "../data/datasource/apod.datasource";
 import { Apod } from "../data/entity/apod.entity";
 import { BotService } from "../service/bot.service";
 import { EnvService } from "../service/env-service";
